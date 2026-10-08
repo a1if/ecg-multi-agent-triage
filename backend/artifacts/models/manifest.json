@@ -1,0 +1,20 @@
+{
+ "sender": {
+  "file": "cnn_lstm_rr_seed0.pt",
+  "sha256": "e0e953787691c522b87c0eb03829f76ab8919f04274835f77bd772cef3d8861d",
+  "arch": "cnn_lstm_rr",
+  "context_dim": 32
+ },
+ "adapter": {
+  "file": "p1_item7_mea_r4_seed101.pt",
+  "sha256": "b3599d27ee055162afb95928c859a40d93c96809e36719b2e8783479d055f244",
+  "trained_for_sender_sha256": "e0e953787691c522b87c0eb03829f76ab8919f04274835f77bd772cef3d8861d",
+  "input_dim": 35,
+  "max_events": 50,
+  "tokens_per_event": 4,
+  "receiver": "google/gemma-4-E4B-it",
+  "receiver_quantisation": "bitsandbytes nf4",
+  "seed": 101
+ },
+ "provenance": "Copied from a1if/Heterogeneous-Multi-Agent-Edge-AI-for-Clinical-Decision-Support (paper repo)"
+}

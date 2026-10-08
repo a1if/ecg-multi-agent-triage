@@ -1,0 +1,72 @@
+{
+ "inference_cold_start_s": 70.8,
+ "killed_after_s": 3.8080456256866455,
+ "status": "complete",
+ "attempts": [
+  [
+   "w005",
+   "filtered",
+   "offline-rule",
+   "agree"
+  ],
+  [
+   "w006",
+   "filtered",
+   "offline-rule",
+   "agree"
+  ],
+  [
+   "w007",
+   "filtered",
+   "offline-rule",
+   "agree"
+  ],
+  [
+   "w009",
+   "filtered",
+   "offline-rule",
+   "agree"
+  ],
+  [
+   "w011",
+   "filtered",
+   "offline-rule",
+   "agree"
+  ],
+  [
+   "w016",
+   "filtered",
+   "offline-rule",
+   "agree"
+  ],
+  [
+   "w017",
+   "filtered",
+   "gemma",
+   "agree"
+  ],
+  [
+   "w018",
+   "filtered",
+   "gemma",
+   "agree"
+  ],
+  [
+   "w019",
+   "filtered",
+   "offline-rule",
+   "agree"
+  ],
+  [
+   "w020",
+   "filtered",
+   "offline-rule",
+   "agree"
+  ]
+ ],
+ "gemma_answers": 2,
+ "offline_answers": 8,
+ "below_screening": [],
+ "narrative_source": "template",
+ "ok": true
+}

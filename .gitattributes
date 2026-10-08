@@ -1,0 +1,8 @@
+# Same line endings on every OS (the containers and CI run Linux)
+* text=auto eol=lf
+*.ps1 text eol=crlf
+
+# Model weights and ECG signal files are binary: never convert or diff them
+*.pt binary
+*.dat binary
+*.atr binary

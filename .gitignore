@@ -1,0 +1,37 @@
+# Python environments and caches
+.venv/
+.venv-gpu/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Local working files (kept off GitHub, as in the paper repo)
+TASKS.md
+CLAUDE.md
+
+# Run output that scripts regenerate
+backend/logs/
+backend/results/agent_run_*.json
+backend/results/audit_*.jsonl
+*.tmp
+
+# Secrets and local settings
+.env
+.env.*
+*.pem
+*.key
+credentials*.json
+
+# Node / frontend (Step 5)
+node_modules/
+.next/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

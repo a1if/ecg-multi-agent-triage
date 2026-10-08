@@ -1,0 +1,1174 @@
+{
+ "rows": [
+  {
+   "record": "100",
+   "mode": "accuracy",
+   "p_under": 0.0,
+   "status": "complete",
+   "seconds": 0.5,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "100",
+   "mode": "accuracy",
+   "p_under": 0.3,
+   "status": "complete",
+   "seconds": 0.48,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "100",
+   "mode": "accuracy",
+   "p_under": 1.0,
+   "status": "complete",
+   "seconds": 0.67,
+   "reviews": 6,
+   "receiver_calls": 8,
+   "injected": 3,
+   "rejected": 3,
+   "overrides": 1,
+   "messages": 18,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "100",
+   "mode": "balanced",
+   "p_under": 0.0,
+   "status": "complete",
+   "seconds": 0.48,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "100",
+   "mode": "balanced",
+   "p_under": 0.3,
+   "status": "complete",
+   "seconds": 0.49,
+   "reviews": 6,
+   "receiver_calls": 8,
+   "injected": 3,
+   "rejected": 3,
+   "overrides": 1,
+   "messages": 18,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "100",
+   "mode": "balanced",
+   "p_under": 1.0,
+   "status": "complete",
+   "seconds": 0.51,
+   "reviews": 6,
+   "receiver_calls": 8,
+   "injected": 3,
+   "rejected": 3,
+   "overrides": 1,
+   "messages": 18,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "100",
+   "mode": "throughput",
+   "p_under": 0.0,
+   "status": "complete",
+   "seconds": 0.5,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "adapter"
+   ],
+   "violations": []
+  },
+  {
+   "record": "100",
+   "mode": "throughput",
+   "p_under": 0.3,
+   "status": "complete",
+   "seconds": 0.5,
+   "reviews": 6,
+   "receiver_calls": 8,
+   "injected": 2,
+   "rejected": 2,
+   "overrides": 0,
+   "messages": 18,
+   "channels": [
+    "adapter",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "100",
+   "mode": "throughput",
+   "p_under": 1.0,
+   "status": "complete",
+   "seconds": 0.51,
+   "reviews": 6,
+   "receiver_calls": 9,
+   "injected": 4,
+   "rejected": 4,
+   "overrides": 1,
+   "messages": 20,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "105",
+   "mode": "accuracy",
+   "p_under": 0.0,
+   "status": "complete",
+   "seconds": 0.53,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "105",
+   "mode": "accuracy",
+   "p_under": 0.3,
+   "status": "complete",
+   "seconds": 0.56,
+   "reviews": 6,
+   "receiver_calls": 8,
+   "injected": 2,
+   "rejected": 2,
+   "overrides": 0,
+   "messages": 18,
+   "channels": [
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "105",
+   "mode": "accuracy",
+   "p_under": 1.0,
+   "status": "complete",
+   "seconds": 0.59,
+   "reviews": 6,
+   "receiver_calls": 18,
+   "injected": 18,
+   "rejected": 18,
+   "overrides": 6,
+   "messages": 38,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "105",
+   "mode": "balanced",
+   "p_under": 0.0,
+   "status": "complete",
+   "seconds": 0.56,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "105",
+   "mode": "balanced",
+   "p_under": 0.3,
+   "status": "complete",
+   "seconds": 0.55,
+   "reviews": 6,
+   "receiver_calls": 11,
+   "injected": 5,
+   "rejected": 5,
+   "overrides": 0,
+   "messages": 24,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "105",
+   "mode": "balanced",
+   "p_under": 1.0,
+   "status": "complete",
+   "seconds": 0.59,
+   "reviews": 6,
+   "receiver_calls": 18,
+   "injected": 18,
+   "rejected": 18,
+   "overrides": 6,
+   "messages": 38,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "105",
+   "mode": "throughput",
+   "p_under": 0.0,
+   "status": "complete",
+   "seconds": 0.55,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "adapter"
+   ],
+   "violations": []
+  },
+  {
+   "record": "105",
+   "mode": "throughput",
+   "p_under": 0.3,
+   "status": "complete",
+   "seconds": 0.57,
+   "reviews": 6,
+   "receiver_calls": 9,
+   "injected": 3,
+   "rejected": 3,
+   "overrides": 0,
+   "messages": 20,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "105",
+   "mode": "throughput",
+   "p_under": 1.0,
+   "status": "complete",
+   "seconds": 0.63,
+   "reviews": 6,
+   "receiver_calls": 18,
+   "injected": 18,
+   "rejected": 18,
+   "overrides": 6,
+   "messages": 38,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "200",
+   "mode": "accuracy",
+   "p_under": 0.0,
+   "status": "complete",
+   "seconds": 0.57,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "200",
+   "mode": "accuracy",
+   "p_under": 0.3,
+   "status": "complete",
+   "seconds": 0.56,
+   "reviews": 6,
+   "receiver_calls": 7,
+   "injected": 1,
+   "rejected": 1,
+   "overrides": 0,
+   "messages": 16,
+   "channels": [
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "200",
+   "mode": "accuracy",
+   "p_under": 1.0,
+   "status": "complete",
+   "seconds": 0.63,
+   "reviews": 6,
+   "receiver_calls": 18,
+   "injected": 18,
+   "rejected": 18,
+   "overrides": 6,
+   "messages": 38,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "200",
+   "mode": "balanced",
+   "p_under": 0.0,
+   "status": "complete",
+   "seconds": 0.6,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "adapter"
+   ],
+   "violations": []
+  },
+  {
+   "record": "200",
+   "mode": "balanced",
+   "p_under": 0.3,
+   "status": "complete",
+   "seconds": 0.57,
+   "reviews": 6,
+   "receiver_calls": 9,
+   "injected": 3,
+   "rejected": 3,
+   "overrides": 0,
+   "messages": 20,
+   "channels": [
+    "adapter",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "200",
+   "mode": "balanced",
+   "p_under": 1.0,
+   "status": "complete",
+   "seconds": 0.62,
+   "reviews": 6,
+   "receiver_calls": 18,
+   "injected": 18,
+   "rejected": 18,
+   "overrides": 6,
+   "messages": 38,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "200",
+   "mode": "throughput",
+   "p_under": 0.0,
+   "status": "complete",
+   "seconds": 0.58,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "adapter"
+   ],
+   "violations": []
+  },
+  {
+   "record": "200",
+   "mode": "throughput",
+   "p_under": 0.3,
+   "status": "complete",
+   "seconds": 0.68,
+   "reviews": 6,
+   "receiver_calls": 10,
+   "injected": 4,
+   "rejected": 4,
+   "overrides": 0,
+   "messages": 22,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "200",
+   "mode": "throughput",
+   "p_under": 1.0,
+   "status": "complete",
+   "seconds": 0.6,
+   "reviews": 6,
+   "receiver_calls": 18,
+   "injected": 18,
+   "rejected": 18,
+   "overrides": 6,
+   "messages": 38,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "210",
+   "mode": "accuracy",
+   "p_under": 0.0,
+   "status": "complete",
+   "seconds": 0.56,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "210",
+   "mode": "accuracy",
+   "p_under": 0.3,
+   "status": "complete",
+   "seconds": 0.62,
+   "reviews": 6,
+   "receiver_calls": 8,
+   "injected": 2,
+   "rejected": 2,
+   "overrides": 0,
+   "messages": 18,
+   "channels": [
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "210",
+   "mode": "accuracy",
+   "p_under": 1.0,
+   "status": "complete",
+   "seconds": 0.62,
+   "reviews": 6,
+   "receiver_calls": 18,
+   "injected": 18,
+   "rejected": 18,
+   "overrides": 6,
+   "messages": 38,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "210",
+   "mode": "balanced",
+   "p_under": 0.0,
+   "status": "complete",
+   "seconds": 0.62,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "adapter"
+   ],
+   "violations": []
+  },
+  {
+   "record": "210",
+   "mode": "balanced",
+   "p_under": 0.3,
+   "status": "complete",
+   "seconds": 0.55,
+   "reviews": 6,
+   "receiver_calls": 8,
+   "injected": 2,
+   "rejected": 2,
+   "overrides": 0,
+   "messages": 18,
+   "channels": [
+    "adapter",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "210",
+   "mode": "balanced",
+   "p_under": 1.0,
+   "status": "complete",
+   "seconds": 0.6,
+   "reviews": 6,
+   "receiver_calls": 18,
+   "injected": 18,
+   "rejected": 18,
+   "overrides": 6,
+   "messages": 38,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "210",
+   "mode": "throughput",
+   "p_under": 0.0,
+   "status": "complete",
+   "seconds": 0.57,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "adapter"
+   ],
+   "violations": []
+  },
+  {
+   "record": "210",
+   "mode": "throughput",
+   "p_under": 0.3,
+   "status": "complete",
+   "seconds": 0.6,
+   "reviews": 6,
+   "receiver_calls": 10,
+   "injected": 4,
+   "rejected": 4,
+   "overrides": 0,
+   "messages": 22,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "210",
+   "mode": "throughput",
+   "p_under": 1.0,
+   "status": "complete",
+   "seconds": 0.69,
+   "reviews": 6,
+   "receiver_calls": 18,
+   "injected": 18,
+   "rejected": 18,
+   "overrides": 6,
+   "messages": 38,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "213",
+   "mode": "accuracy",
+   "p_under": 0.0,
+   "status": "complete",
+   "seconds": 0.65,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "213",
+   "mode": "accuracy",
+   "p_under": 0.3,
+   "status": "complete",
+   "seconds": 0.67,
+   "reviews": 6,
+   "receiver_calls": 8,
+   "injected": 2,
+   "rejected": 2,
+   "overrides": 0,
+   "messages": 18,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "213",
+   "mode": "accuracy",
+   "p_under": 1.0,
+   "status": "complete",
+   "seconds": 0.7,
+   "reviews": 6,
+   "receiver_calls": 18,
+   "injected": 18,
+   "rejected": 18,
+   "overrides": 6,
+   "messages": 38,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "213",
+   "mode": "balanced",
+   "p_under": 0.0,
+   "status": "complete",
+   "seconds": 0.66,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "adapter",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "213",
+   "mode": "balanced",
+   "p_under": 0.3,
+   "status": "complete",
+   "seconds": 0.67,
+   "reviews": 6,
+   "receiver_calls": 9,
+   "injected": 3,
+   "rejected": 3,
+   "overrides": 0,
+   "messages": 20,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "213",
+   "mode": "balanced",
+   "p_under": 1.0,
+   "status": "complete",
+   "seconds": 0.76,
+   "reviews": 6,
+   "receiver_calls": 18,
+   "injected": 18,
+   "rejected": 18,
+   "overrides": 6,
+   "messages": 38,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "213",
+   "mode": "throughput",
+   "p_under": 0.0,
+   "status": "complete",
+   "seconds": 0.94,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "adapter"
+   ],
+   "violations": []
+  },
+  {
+   "record": "213",
+   "mode": "throughput",
+   "p_under": 0.3,
+   "status": "complete",
+   "seconds": 0.63,
+   "reviews": 6,
+   "receiver_calls": 7,
+   "injected": 1,
+   "rejected": 1,
+   "overrides": 0,
+   "messages": 16,
+   "channels": [
+    "adapter",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "213",
+   "mode": "throughput",
+   "p_under": 1.0,
+   "status": "complete",
+   "seconds": 0.7,
+   "reviews": 6,
+   "receiver_calls": 18,
+   "injected": 18,
+   "rejected": 18,
+   "overrides": 6,
+   "messages": 38,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "222",
+   "mode": "accuracy",
+   "p_under": 0.0,
+   "status": "complete",
+   "seconds": 0.55,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "222",
+   "mode": "accuracy",
+   "p_under": 0.3,
+   "status": "complete",
+   "seconds": 0.56,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "222",
+   "mode": "accuracy",
+   "p_under": 1.0,
+   "status": "complete",
+   "seconds": 0.49,
+   "reviews": 6,
+   "receiver_calls": 10,
+   "injected": 6,
+   "rejected": 6,
+   "overrides": 2,
+   "messages": 22,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "222",
+   "mode": "balanced",
+   "p_under": 0.0,
+   "status": "complete",
+   "seconds": 0.47,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "adapter",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "222",
+   "mode": "balanced",
+   "p_under": 0.3,
+   "status": "complete",
+   "seconds": 0.49,
+   "reviews": 6,
+   "receiver_calls": 7,
+   "injected": 1,
+   "rejected": 1,
+   "overrides": 0,
+   "messages": 16,
+   "channels": [
+    "adapter",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "222",
+   "mode": "balanced",
+   "p_under": 1.0,
+   "status": "complete",
+   "seconds": 0.49,
+   "reviews": 6,
+   "receiver_calls": 12,
+   "injected": 8,
+   "rejected": 8,
+   "overrides": 2,
+   "messages": 26,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "222",
+   "mode": "throughput",
+   "p_under": 0.0,
+   "status": "complete",
+   "seconds": 0.48,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "adapter"
+   ],
+   "violations": []
+  },
+  {
+   "record": "222",
+   "mode": "throughput",
+   "p_under": 0.3,
+   "status": "complete",
+   "seconds": 0.49,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "adapter"
+   ],
+   "violations": []
+  },
+  {
+   "record": "222",
+   "mode": "throughput",
+   "p_under": 1.0,
+   "status": "complete",
+   "seconds": 0.58,
+   "reviews": 6,
+   "receiver_calls": 11,
+   "injected": 7,
+   "rejected": 7,
+   "overrides": 2,
+   "messages": 24,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "233",
+   "mode": "accuracy",
+   "p_under": 0.0,
+   "status": "complete",
+   "seconds": 0.6,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "233",
+   "mode": "accuracy",
+   "p_under": 0.3,
+   "status": "complete",
+   "seconds": 0.61,
+   "reviews": 6,
+   "receiver_calls": 10,
+   "injected": 6,
+   "rejected": 6,
+   "overrides": 2,
+   "messages": 22,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "233",
+   "mode": "accuracy",
+   "p_under": 1.0,
+   "status": "complete",
+   "seconds": 0.67,
+   "reviews": 6,
+   "receiver_calls": 18,
+   "injected": 18,
+   "rejected": 18,
+   "overrides": 6,
+   "messages": 38,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "233",
+   "mode": "balanced",
+   "p_under": 0.0,
+   "status": "complete",
+   "seconds": 0.71,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "adapter"
+   ],
+   "violations": []
+  },
+  {
+   "record": "233",
+   "mode": "balanced",
+   "p_under": 0.3,
+   "status": "complete",
+   "seconds": 0.64,
+   "reviews": 6,
+   "receiver_calls": 12,
+   "injected": 7,
+   "rejected": 7,
+   "overrides": 1,
+   "messages": 26,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "233",
+   "mode": "balanced",
+   "p_under": 1.0,
+   "status": "complete",
+   "seconds": 0.68,
+   "reviews": 6,
+   "receiver_calls": 18,
+   "injected": 18,
+   "rejected": 18,
+   "overrides": 6,
+   "messages": 38,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "233",
+   "mode": "throughput",
+   "p_under": 0.0,
+   "status": "complete",
+   "seconds": 0.62,
+   "reviews": 6,
+   "receiver_calls": 6,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "messages": 14,
+   "channels": [
+    "adapter"
+   ],
+   "violations": []
+  },
+  {
+   "record": "233",
+   "mode": "throughput",
+   "p_under": 0.3,
+   "status": "complete",
+   "seconds": 0.64,
+   "reviews": 6,
+   "receiver_calls": 7,
+   "injected": 1,
+   "rejected": 1,
+   "overrides": 0,
+   "messages": 16,
+   "channels": [
+    "adapter",
+    "filtered"
+   ],
+   "violations": []
+  },
+  {
+   "record": "233",
+   "mode": "throughput",
+   "p_under": 1.0,
+   "status": "complete",
+   "seconds": 0.66,
+   "reviews": 6,
+   "receiver_calls": 18,
+   "injected": 18,
+   "rejected": 18,
+   "overrides": 6,
+   "messages": 38,
+   "channels": [
+    "adapter",
+    "compact",
+    "filtered"
+   ],
+   "violations": []
+  }
+ ],
+ "summary": {
+  "0.0": {
+   "runs": 21,
+   "violations": 0,
+   "injected": 0,
+   "rejected": 0,
+   "overrides": 0,
+   "median_seconds": 0.57
+  },
+  "0.3": {
+   "runs": 21,
+   "violations": 0,
+   "injected": 52,
+   "rejected": 52,
+   "overrides": 4,
+   "median_seconds": 0.57
+  },
+  "1.0": {
+   "runs": 21,
+   "violations": 0,
+   "injected": 301,
+   "rejected": 301,
+   "overrides": 99,
+   "median_seconds": 0.62
+  }
+ },
+ "violations": 0,
+ "minutes": 10
+}

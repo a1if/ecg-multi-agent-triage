@@ -1,0 +1,744 @@
+{
+ "rows": [
+  {
+   "record": "100",
+   "scenario": "clean",
+   "expected": "ok",
+   "got": "ok",
+   "match": true,
+   "warnings": [],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "100",
+   "scenario": "inverted",
+   "expected": "ok",
+   "got": "ok",
+   "match": true,
+   "warnings": [],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "100",
+   "scenario": "wander",
+   "expected": "ok",
+   "got": "ok",
+   "match": true,
+   "warnings": [],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "100",
+   "scenario": "noise_burst",
+   "expected": "windows",
+   "got": "windows",
+   "match": true,
+   "warnings": [
+    "3 of 8 windows too noisy to classify; listed for manual review"
+   ],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "100",
+   "scenario": "dropout_50",
+   "expected": "warning",
+   "got": "warning",
+   "match": true,
+   "warnings": [
+    "36% of the recording is flat (no signal); those stretches were not assessed",
+    "very irregular RR (CV 1.548): possible missed beats, or real arrhythmia"
+   ],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "100",
+   "scenario": "noise_10db",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 90% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "100",
+   "scenario": "noise_0db",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 100% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "100",
+   "scenario": "noise_-6db",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 100% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "100",
+   "scenario": "clipped",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: flat or clipped signal (quality index 0.251); 100% unclassifiable beats; 64% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "100",
+   "scenario": "dropout_90",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 54% of the recording is flat (no signal: electrode off?); implausible beat rate 29.4 bpm",
+   "violations": []
+  },
+  {
+   "record": "105",
+   "scenario": "clean",
+   "expected": "ok",
+   "got": "ok",
+   "match": true,
+   "warnings": [],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "105",
+   "scenario": "inverted",
+   "expected": "ok",
+   "got": "ok",
+   "match": true,
+   "warnings": [],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "105",
+   "scenario": "wander",
+   "expected": "ok",
+   "got": "ok",
+   "match": true,
+   "warnings": [],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "105",
+   "scenario": "noise_burst",
+   "expected": "windows",
+   "got": "windows",
+   "match": true,
+   "warnings": [
+    "3 of 9 windows too noisy to classify; listed for manual review"
+   ],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "105",
+   "scenario": "dropout_50",
+   "expected": "warning",
+   "got": "warning",
+   "match": true,
+   "warnings": [
+    "36% of the recording is flat (no signal); those stretches were not assessed",
+    "very irregular RR (CV 1.654): possible missed beats, or real arrhythmia"
+   ],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "105",
+   "scenario": "noise_10db",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 87% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "105",
+   "scenario": "noise_0db",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 100% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "105",
+   "scenario": "noise_-6db",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 100% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "105",
+   "scenario": "clipped",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: flat or clipped signal (quality index 0.244); 99% unclassifiable beats",
+   "violations": []
+  },
+  {
+   "record": "105",
+   "scenario": "dropout_90",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 54% of the recording is flat (no signal: electrode off?)",
+   "violations": []
+  },
+  {
+   "record": "200",
+   "scenario": "clean",
+   "expected": "ok",
+   "got": "ok",
+   "match": true,
+   "warnings": [],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "200",
+   "scenario": "inverted",
+   "expected": "ok",
+   "got": "ok",
+   "match": true,
+   "warnings": [],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "200",
+   "scenario": "wander",
+   "expected": "ok",
+   "got": "ok",
+   "match": true,
+   "warnings": [],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "200",
+   "scenario": "noise_burst",
+   "expected": "windows",
+   "got": "windows",
+   "match": true,
+   "warnings": [
+    "4 of 10 windows too noisy to classify; listed for manual review"
+   ],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "200",
+   "scenario": "dropout_50",
+   "expected": "warning",
+   "got": "warning",
+   "match": true,
+   "warnings": [
+    "36% of the recording is flat (no signal); those stretches were not assessed",
+    "very irregular RR (CV 1.671): possible missed beats, or real arrhythmia"
+   ],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "200",
+   "scenario": "noise_10db",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 70% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "200",
+   "scenario": "noise_0db",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 100% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "200",
+   "scenario": "noise_-6db",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 100% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "200",
+   "scenario": "clipped",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: flat or clipped signal (quality index 0.266); 94% unclassifiable beats",
+   "violations": []
+  },
+  {
+   "record": "200",
+   "scenario": "dropout_90",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 54% of the recording is flat (no signal: electrode off?)",
+   "violations": []
+  },
+  {
+   "record": "210",
+   "scenario": "clean",
+   "expected": "ok",
+   "got": "ok",
+   "match": true,
+   "warnings": [],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "210",
+   "scenario": "inverted",
+   "expected": "ok",
+   "got": "ok",
+   "match": true,
+   "warnings": [],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "210",
+   "scenario": "wander",
+   "expected": "ok",
+   "got": "ok",
+   "match": true,
+   "warnings": [],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "210",
+   "scenario": "noise_burst",
+   "expected": "windows",
+   "got": "windows",
+   "match": true,
+   "warnings": [
+    "3 of 10 windows too noisy to classify; listed for manual review"
+   ],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "210",
+   "scenario": "dropout_50",
+   "expected": "warning",
+   "got": "warning",
+   "match": true,
+   "warnings": [
+    "36% of the recording is flat (no signal); those stretches were not assessed",
+    "very irregular RR (CV 1.686): possible missed beats, or real arrhythmia"
+   ],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "210",
+   "scenario": "noise_10db",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 94% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "210",
+   "scenario": "noise_0db",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 100% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "210",
+   "scenario": "noise_-6db",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 100% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "210",
+   "scenario": "clipped",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: flat or clipped signal (quality index 0.245); 85% unclassifiable beats",
+   "violations": []
+  },
+  {
+   "record": "210",
+   "scenario": "dropout_90",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 54% of the recording is flat (no signal: electrode off?)",
+   "violations": []
+  },
+  {
+   "record": "213",
+   "scenario": "clean",
+   "expected": "ok",
+   "got": "ok",
+   "match": true,
+   "warnings": [],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "213",
+   "scenario": "inverted",
+   "expected": "ok",
+   "got": "ok",
+   "match": true,
+   "warnings": [],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "213",
+   "scenario": "wander",
+   "expected": "ok",
+   "got": "ok",
+   "match": true,
+   "warnings": [],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "213",
+   "scenario": "noise_burst",
+   "expected": "windows",
+   "got": "windows",
+   "match": true,
+   "warnings": [
+    "3 of 12 windows too noisy to classify; listed for manual review"
+   ],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "213",
+   "scenario": "dropout_50",
+   "expected": "warning",
+   "got": "warning",
+   "match": true,
+   "warnings": [
+    "36% of the recording is flat (no signal); those stretches were not assessed",
+    "very irregular RR (CV 1.918): possible missed beats, or real arrhythmia"
+   ],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "213",
+   "scenario": "noise_10db",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 86% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "213",
+   "scenario": "noise_0db",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 100% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "213",
+   "scenario": "noise_-6db",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 100% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "213",
+   "scenario": "clipped",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: flat or clipped signal (quality index 0.31); 100% unclassifiable beats",
+   "violations": []
+  },
+  {
+   "record": "213",
+   "scenario": "dropout_90",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 54% of the recording is flat (no signal: electrode off?)",
+   "violations": []
+  },
+  {
+   "record": "222",
+   "scenario": "clean",
+   "expected": "ok",
+   "got": "ok",
+   "match": true,
+   "warnings": [],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "222",
+   "scenario": "inverted",
+   "expected": "ok",
+   "got": "ok",
+   "match": true,
+   "warnings": [],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "222",
+   "scenario": "wander",
+   "expected": "ok",
+   "got": "ok",
+   "match": true,
+   "warnings": [],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "222",
+   "scenario": "noise_burst",
+   "expected": "windows",
+   "got": "windows",
+   "match": true,
+   "warnings": [
+    "noise level 0.0465 may reduce accuracy",
+    "3 of 9 windows too noisy to classify; listed for manual review"
+   ],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "222",
+   "scenario": "dropout_50",
+   "expected": "warning",
+   "got": "warning",
+   "match": true,
+   "warnings": [
+    "36% of the recording is flat (no signal); those stretches were not assessed",
+    "very irregular RR (CV 1.548): possible missed beats, or real arrhythmia"
+   ],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "222",
+   "scenario": "noise_10db",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 100% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "222",
+   "scenario": "noise_0db",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 100% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "222",
+   "scenario": "noise_-6db",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 100% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "222",
+   "scenario": "clipped",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: flat or clipped signal (quality index 0.268); 88% unclassifiable beats; 62% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "222",
+   "scenario": "dropout_90",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 54% of the recording is flat (no signal: electrode off?); implausible beat rate 29.2 bpm",
+   "violations": []
+  },
+  {
+   "record": "233",
+   "scenario": "clean",
+   "expected": "ok",
+   "got": "ok",
+   "match": true,
+   "warnings": [],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "233",
+   "scenario": "inverted",
+   "expected": "ok",
+   "got": "ok",
+   "match": true,
+   "warnings": [],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "233",
+   "scenario": "wander",
+   "expected": "ok",
+   "got": "ok",
+   "match": true,
+   "warnings": [],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "233",
+   "scenario": "noise_burst",
+   "expected": "windows",
+   "got": "windows",
+   "match": true,
+   "warnings": [
+    "4 of 11 windows too noisy to classify; listed for manual review"
+   ],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "233",
+   "scenario": "dropout_50",
+   "expected": "warning",
+   "got": "warning",
+   "match": true,
+   "warnings": [
+    "36% of the recording is flat (no signal); those stretches were not assessed",
+    "very irregular RR (CV 1.862): possible missed beats, or real arrhythmia"
+   ],
+   "error": null,
+   "violations": []
+  },
+  {
+   "record": "233",
+   "scenario": "noise_10db",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 58% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "233",
+   "scenario": "noise_0db",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 100% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "233",
+   "scenario": "noise_-6db",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 100% of beats too noisy to classify reliably",
+   "violations": []
+  },
+  {
+   "record": "233",
+   "scenario": "clipped",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: flat or clipped signal (quality index 0.221); 98% unclassifiable beats",
+   "violations": []
+  },
+  {
+   "record": "233",
+   "scenario": "dropout_90",
+   "expected": "unreadable",
+   "got": "unreadable",
+   "match": true,
+   "warnings": [],
+   "error": "recording unreadable: 54% of the recording is flat (no signal: electrode off?)",
+   "violations": []
+  }
+ ],
+ "matches": 70,
+ "total": 70,
+ "violations": 0,
+ "minutes": 5
+}
