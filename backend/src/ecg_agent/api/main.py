@@ -7,6 +7,7 @@
     GET  /v1/runs                           the worklist: most urgent first
     GET  /v1/runs/{id}                      status, report, findings, summary
     GET  /v1/runs/{id}/events               live stream of every agent step (server-sent events)
+    GET  /v1/runs/{id}/steps?after=N        the same steps as plain JSON, for clients that poll
     GET  /v1/runs/{id}/signal               min-max signal envelope + beats for a time range
     GET  /v1/runs/{id}/audit                every message and verdict
     POST /v1/runs/{id}/questions            a clinician question
@@ -226,6 +227,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             finally:
                 run.tracer.listeners.discard(ev)
         return EventSourceResponse(stream())
+
+    @app.get("/v1/runs/{run_id}/steps")
+    async def steps(run=Depends(get_run), after: int = -1, limit: int = 500) -> dict:
+        """The same steps as /events, as plain JSON for clients that poll (e.g. the Streamlit frontend)."""
+        s = run.tracer.steps[after + 1:after + 1 + max(1, min(limit, 2000))]
+        return {"steps": jsonable(s), "status": run.status,
+                "done": run.task is not None and run.task.done(), "total": len(run.tracer.steps)}
 
     @app.get("/v1/runs/{run_id}/signal")
     async def signal(run=Depends(get_run), start_s: float = 0.0, end_s: float = 30.0, max_points: int = 2000) -> dict:

@@ -29,7 +29,9 @@ PowerShell syntax is `$env:RECEIVER = "http"` on its own line, not the `RECEIVER
 ./.venv/Scripts/python.exe -m pytest -q
 ```
 
-74 tests: the triage rule and prompts, the sender against the paper's numbers, the message policy (each test tries
+Frontend page tests (fake API, no backend needed), from `frontend/`: `..ackend\.venv\Scripts\python.exe -m pytest -q`.
+
+Backend: 74 tests: the triage rule and prompts, the sender against the paper's numbers, the message policy (each test tries
 to make an agent step outside its job), both agents end to end with injected faults, clinician questions including
 hostile ones, signal faults, and both services over HTTP (with a fake GPU engine). Lint:
 
@@ -73,7 +75,9 @@ Start them (pick one):
 ```
 
 The first needs no GPU: the reasoning agent's answers come from the rule, labelled `offline-rule`. The second starts
-Gemma (about a minute) and uses it. Then open **http://127.0.0.1:8000/docs**: every endpoint has a *Try it out* button.
+Gemma (about a minute) and uses it. Both also start the frontend: open **http://127.0.0.1:8501** for the worklist,
+the ECG with each agent's findings, the agents' live conversation, questions and overrides. For the raw API, open
+**http://127.0.0.1:8000/docs**: every endpoint has a *Try it out* button.
 
 A session to try, in that page or with curl:
 

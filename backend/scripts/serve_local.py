@@ -4,8 +4,9 @@
     python scripts/serve_local.py --gpu        # GPU inference service + API using it (recorded answers first)
     python scripts/serve_local.py --gpu --gemma-everywhere   # Gemma also plans and routes questions
     python scripts/serve_local.py --uploads    # allow CSV uploads (local use only)
+    python scripts/serve_local.py --no-ui      # services only, no Streamlit frontend
 
-Then open http://127.0.0.1:8000/docs for the interactive API.
+Then open http://127.0.0.1:8501 (frontend) or http://127.0.0.1:8000/docs (interactive API).
 """
 from __future__ import annotations
 
@@ -43,7 +44,9 @@ def main() -> None:
     ap.add_argument("--gpu", action="store_true", help="also start the GPU inference service and use it")
     ap.add_argument("--gemma-everywhere", action="store_true", help="Gemma plans and routes questions too")
     ap.add_argument("--uploads", action="store_true", help="allow CSV uploads")
+    ap.add_argument("--no-ui", action="store_true", help="do not start the Streamlit frontend")
     a = ap.parse_args()
+    sys.stdout.reconfigure(line_buffering=True)  # print progress at once, even when redirected to a file
     (ROOT / "logs").mkdir(exist_ok=True)
     procs, token = [], "local-dev"
     base = {**os.environ, "PYTHONUNBUFFERED": "1"}
@@ -64,7 +67,26 @@ def main() -> None:
                                env=env, stdout=open(ROOT / "logs/api.log", "w"), stderr=subprocess.STDOUT)
         procs.append(api)
         ready("http://127.0.0.1:8000", 120, api, "api")
-        print("\nReady. Interactive API: http://127.0.0.1:8000/docs   (Ctrl+C to stop)")
+        if not a.no_ui:
+            print("Starting the frontend...")
+            ui = subprocess.Popen([CPU_PY, "-m", "streamlit", "run", "app.py", "--server.port", "8501",
+                                   "--server.address", "127.0.0.1", "--server.headless", "true",
+                                   "--browser.gatherUsageStats", "false"], cwd=ROOT.parent / "frontend",
+                                  env={**base, "API_URL": "http://127.0.0.1:8000"},
+                                  stdout=open(ROOT / "logs/frontend.log", "w"), stderr=subprocess.STDOUT)
+            procs.append(ui)
+            t0 = time.time()
+            while time.time() - t0 < 60:
+                try:
+                    if httpx.get("http://127.0.0.1:8501/_stcore/health", timeout=2).status_code == 200:
+                        break
+                except httpx.HTTPError:
+                    pass
+                time.sleep(1)
+        print("\nReady.")
+        if not a.no_ui:
+            print("  Frontend:        http://127.0.0.1:8501")
+        print("  Interactive API: http://127.0.0.1:8000/docs\n(Ctrl+C to stop)")
         while all(p.poll() is None for p in procs):
             time.sleep(1)
         print("A service stopped; see logs/.")
