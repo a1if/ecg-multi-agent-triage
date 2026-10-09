@@ -1,0 +1,24 @@
+# Weekly update PRs; CI (tests + safety evaluation) decides whether each one is safe to merge.
+# torch, transformers and bitsandbytes are pinned on purpose in the GPU image: changing them changes the receiver,
+# so their updates go through the accuracy gate by hand (docs/design.md §6d), not through Dependabot.
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /backend
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: torch
+      - dependency-name: torchvision
+      - dependency-name: transformers
+      - dependency-name: bitsandbytes
+      - dependency-name: accelerate
+  - package-ecosystem: pip
+    directory: /frontend
+    schedule: { interval: weekly }
+  - package-ecosystem: docker
+    directories: [/backend, /frontend]
+    schedule: { interval: weekly }
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }

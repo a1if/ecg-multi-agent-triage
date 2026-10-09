@@ -169,7 +169,6 @@ QUESTIONS = [  # (question, acceptable answer types)
 
 
 def gemma(minutes: float) -> dict:
-    from ecg_agent.agent.grounding import check_narrative
     from ecg_agent.agent.questions import GemmaClassifier
     from ecg_agent.receiver.gemma import GemmaEngine
     from ecg_agent.receiver.local import LocalGemmaReceiver
