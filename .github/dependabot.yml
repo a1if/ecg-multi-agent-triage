@@ -1,6 +1,7 @@
 # Weekly update PRs; CI (tests + safety evaluation) decides whether each one is safe to merge.
 # torch, transformers and bitsandbytes are pinned on purpose in the GPU image: changing them changes the receiver,
 # so their updates go through the accuracy gate by hand (docs/design.md §6d), not through Dependabot.
+# Updates are grouped: one PR per ecosystem and folder, so updates to the same file never conflict with each other.
 version: 2
 updates:
   - package-ecosystem: pip
@@ -13,12 +14,20 @@ updates:
       - dependency-name: transformers
       - dependency-name: bitsandbytes
       - dependency-name: accelerate
+    groups:
+      backend: { patterns: ["*"] }
   - package-ecosystem: pip
     directory: /frontend
     schedule: { interval: weekly }
+    groups:
+      frontend: { patterns: ["*"] }
   - package-ecosystem: docker
     directories: [/backend, /frontend]
     schedule: { interval: weekly }
+    groups:
+      base-images: { patterns: ["*"] }
   - package-ecosystem: github-actions
     directory: /
     schedule: { interval: weekly }
+    groups:
+      actions: { patterns: ["*"] }
