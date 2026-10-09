@@ -10,7 +10,24 @@ import os
 import httpx
 
 API_URL = os.environ.get("API_URL", "http://127.0.0.1:8000").rstrip("/")
+# On Cloud Run the API accepts calls only from this frontend's service account: each call carries a Google-signed
+# ID token from the metadata server (no key or shared secret anywhere). Locally API_AUTH is unset: no token.
+API_AUTH = os.environ.get("API_AUTH", "none")
 _client = httpx.Client(base_url=API_URL, timeout=30.0)
+_token: dict = {"value": None, "expires": 0.0}
+
+
+def _auth_headers() -> dict:
+    if API_AUTH != "gcp":
+        return {}
+    import time
+
+    if _token["value"] is None or time.time() > _token["expires"]:
+        r = httpx.get("http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity",
+                      params={"audience": API_URL}, headers={"Metadata-Flavor": "Google"}, timeout=5.0)
+        r.raise_for_status()
+        _token["value"], _token["expires"] = r.text, time.time() + 50 * 60  # tokens live 60 min
+    return {"Authorization": f"Bearer {_token['value']}"}
 
 
 class ApiError(RuntimeError):
@@ -21,7 +38,7 @@ class ApiError(RuntimeError):
 
 def _call(method: str, path: str, **kw):
     try:
-        r = _client.request(method, path, **kw)
+        r = _client.request(method, path, headers=_auth_headers(), **kw)
     except httpx.HTTPError as exc:
         raise ApiError(0, f"cannot reach the API at {API_URL} ({type(exc).__name__})") from exc
     if r.status_code >= 400:

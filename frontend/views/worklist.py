@@ -26,21 +26,27 @@ with st.expander("➕ Analyse a recording", expanded=not st.session_state.get("h
         st.error(e.detail)
         st.stop()
     status = st.session_state.get("status") or {}
+    presets = bool(status.get("demo_presets"))
+    if presets:
+        st.caption("Public demo: each record's first 5 minutes with a 6-window review budget, the settings whose "
+                   "answers were recorded from real Gemma runs on a GPU. Answers say where they came from.")
     with st.form("new_run"):
         c1, c2, c3 = st.columns(3)
         rec = c1.selectbox("Record (MIT-BIH, held-out patients)", [r["id"] for r in recs],
                            index=[r["id"] for r in recs].index("233") if any(r["id"] == "233" for r in recs) else 0)
         full = next(r["duration_s"] for r in recs if r["id"] == rec)
         max_d = float(status.get("max_duration_s", 600))
-        start = c2.number_input("Start (s)", 0.0, max(0.0, full - 30), 0.0, step=30.0)
-        dur = c3.number_input("Length (s)", 30.0, max_d, min(300.0, max_d), step=30.0)
+        start, dur = 0.0, 300.0
+        if not presets:
+            start = c2.number_input("Start (s)", 0.0, max(0.0, full - 30), 0.0, step=30.0)
+            dur = c3.number_input("Length (s)", 30.0, max_d, min(300.0, max_d), step=30.0)
         c4, c5, c6 = st.columns(3)
         mode = c4.selectbox("Mode", ["balanced", "accuracy", "throughput"],
                             help="balanced: the perception agent picks the channel per window; accuracy: filtered "
                                  "text (most accurate); throughput: virtual tokens (flat, low cost)")
         scenario = c5.selectbox("Stress scenario", ["none"] + scen,
                                 help="Damage the signal on purpose and watch the perception agent notice")
-        reviews = c6.slider("Review budget (windows)", 1, 12, 6)
+        reviews = 6 if presets else c6.slider("Review budget (windows)", 1, 12, 6)
         go = st.form_submit_button("Start", type="primary")
     if go:
         try:

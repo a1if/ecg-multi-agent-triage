@@ -30,6 +30,9 @@ class Settings:
     planner: str = "rule"  # "rule" | "gemma"
     classifier: str = "rule"  # "rule" | "gemma" (clinician questions)
     allow_uploads: bool = False  # off in the public demo (design §2); on in local / clinician deployments
+    # Public demo without a GPU: runs are fixed to the presets whose Gemma answers were recorded
+    # (scripts/record_demo_answers.py), so visitors see recorded Gemma answers rather than the rule fallback.
+    demo_presets: bool = False
     max_duration_s: float = 600.0  # longest segment one run may analyse
     max_reviews: int = 6
     max_concurrent_runs: int = 2
@@ -53,6 +56,7 @@ class Settings:
             planner=_env("PLANNER", d.planner),
             classifier=_env("CLASSIFIER", d.classifier),
             allow_uploads=_flag("ALLOW_UPLOADS", d.allow_uploads),
+            demo_presets=_flag("DEMO_PRESETS", d.demo_presets),
             max_duration_s=float(_env("MAX_DURATION_S", str(d.max_duration_s))),
             max_reviews=int(_env("MAX_REVIEWS", str(d.max_reviews))),
             max_concurrent_runs=int(_env("MAX_CONCURRENT_RUNS", str(d.max_concurrent_runs))),
