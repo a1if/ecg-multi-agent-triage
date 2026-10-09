@@ -148,7 +148,7 @@ jobs:
           curl -sf "http://localhost:$port$path"
           test "$(docker exec smoke id -un)" = app  # never root
       - name: Vulnerability scan (report only)
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
           severity: CRITICAL,HIGH
