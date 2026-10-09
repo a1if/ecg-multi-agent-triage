@@ -1,5 +1,5 @@
 # Frontend: a thin client of the API (no ML dependencies)
-streamlit>=1.40
+streamlit>=1.65.0
 plotly>=5.20
 pandas>=2.0
 numpy>=1.26
