@@ -1,0 +1,79 @@
+# Everything on one machine.
+#
+#   docker compose up --build                          API + frontend, CPU only (answers from the rule, labelled)
+#   RECEIVER=http docker compose --profile gpu up --build     + the GPU inference service with Gemma
+#   docker compose --profile monitoring up             + Prometheus and Grafana (http://localhost:3000)
+#
+# Frontend: http://localhost:8501   API: http://localhost:8000/docs   GPU service: http://localhost:8001/v1/info
+# The GPU profile needs an NVIDIA GPU with the NVIDIA Container Toolkit (Docker Desktop on Windows: WSL 2 backend),
+# and Gemma's weights in HF_CACHE (default: your Hugging Face cache) or HF_TOKEN to download them.
+# If Docker Hub is unreachable from Docker (seen with Docker Desktop's proxy), use a mirror for base images:
+#   BASE_IMAGE=mirror.gcr.io/library/python:3.12-slim HUB_MIRROR=mirror.gcr.io/ docker compose up --build
+
+name: ecg-triage
+
+services:
+  api:
+    build: { context: ./backend, dockerfile: Dockerfile.api, args: { BASE_IMAGE: "${BASE_IMAGE:-python:3.12-slim}" } }
+    image: ecg-triage/api:local
+    ports: ["127.0.0.1:8000:8000"]
+    environment:
+      RECEIVER: ${RECEIVER:-offline}          # offline | replay | http
+      INFERENCE_URL: http://inference:8001
+      INFERENCE_AUTH: bearer
+      INFERENCE_TOKEN: ${INFERENCE_TOKEN:-compose-local}
+      PLANNER: ${PLANNER:-rule}
+      CLASSIFIER: ${CLASSIFIER:-rule}
+      ALLOW_UPLOADS: ${ALLOW_UPLOADS:-1}     # your own machine: uploads on (the public demo turns them off)
+      CORS_ORIGINS: http://localhost:8501
+      AUDIT_DIR: /app/data/audit
+    volumes:
+      - replay:/app/data/replay              # recorded Gemma answers survive restarts
+    restart: unless-stopped
+
+  frontend:
+    build: { context: ./frontend, args: { BASE_IMAGE: "${BASE_IMAGE:-python:3.12-slim}" } }
+    image: ecg-triage/frontend:local
+    ports: ["127.0.0.1:8501:8501"]
+    environment:
+      API_URL: http://api:8000
+    depends_on:
+      api: { condition: service_healthy }
+    restart: unless-stopped
+
+  inference:
+    profiles: ["gpu"]
+    build: { context: ./backend, dockerfile: Dockerfile.inference, args: { BASE_IMAGE: "${BASE_IMAGE:-python:3.12-slim}" } }
+    image: ecg-triage/inference:local
+    ports: ["127.0.0.1:8001:8001"]
+    environment:
+      INFERENCE_TOKEN: ${INFERENCE_TOKEN:-compose-local}
+      HF_TOKEN: ${HF_TOKEN:-}
+    volumes:
+      - ${HF_CACHE:-~/.cache/huggingface}:/models/hf   # Gemma weights: mounted, never baked into the image
+    deploy:
+      resources:
+        reservations:
+          devices: [{ driver: nvidia, count: 1, capabilities: [gpu] }]
+    restart: unless-stopped
+
+  prometheus:
+    profiles: ["monitoring"]
+    image: ${HUB_MIRROR:-}prom/prometheus:v3.5.0
+    ports: ["127.0.0.1:9090:9090"]
+    volumes: ["./ops/prometheus.yml:/etc/prometheus/prometheus.yml:ro"]
+
+  grafana:
+    profiles: ["monitoring"]
+    image: ${HUB_MIRROR:-}grafana/grafana:12.1.0
+    ports: ["127.0.0.1:3000:3000"]
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    volumes:
+      - ./ops/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./ops/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on: [prometheus]
+
+volumes:
+  replay:

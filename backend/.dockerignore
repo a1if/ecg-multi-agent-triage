@@ -1,0 +1,13 @@
+.venv/
+.venv-gpu/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+logs/
+results/
+tests/
+scripts/
+*.egg-info/
+.env
+.env.*

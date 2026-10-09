@@ -29,7 +29,7 @@ PowerShell syntax is `$env:RECEIVER = "http"` on its own line, not the `RECEIVER
 ./.venv/Scripts/python.exe -m pytest -q
 ```
 
-Frontend page tests (fake API, no backend needed), from `frontend/`: `..ackend\.venv\Scripts\python.exe -m pytest -q`.
+Frontend page tests (fake API, no backend needed), from `frontend/`: `..\backend\.venv\Scripts\python.exe -m pytest -q`.
 
 Backend: 74 tests: the triage rule and prompts, the sender against the paper's numbers, the message policy (each test tries
 to make an agent step outside its job), both agents end to end with injected faults, clinician questions including
@@ -115,6 +115,33 @@ curl -s -X POST http://127.0.0.1:8000/v1/runs/PASTE_ID/questions -H "Content-Typ
 ```
 
 Metrics: `http://127.0.0.1:8000/metrics` (API) and `http://127.0.0.1:8001/metrics` (GPU service).
+
+## 3b. Run it in Docker (what the cloud runs)
+
+From the repo root, with Docker Desktop running:
+
+```bash
+docker compose up --build
+```
+
+API + frontend, CPU only: http://localhost:8501 (frontend) and http://localhost:8000/docs (API). Add Prometheus and
+Grafana with `--profile monitoring` (dashboard at http://localhost:3000, no login), and the GPU service with Gemma
+with `--profile gpu` and `RECEIVER=http`:
+
+```bash
+RECEIVER=http docker compose --profile gpu --profile monitoring up --build
+```
+
+If image downloads fail with `504 Gateway Timeout` from `auth.docker.io` (Docker Desktop's proxy failing to reach
+Docker Hub, seen on this machine), use Google's mirror for Docker Hub images:
+
+```bash
+BASE_IMAGE=mirror.gcr.io/library/python:3.12-slim HUB_MIRROR=mirror.gcr.io/ docker compose up --build
+```
+
+In PowerShell set them first: `$env:BASE_IMAGE = "mirror.gcr.io/library/python:3.12-slim"` and
+`$env:HUB_MIRROR = "mirror.gcr.io/"`. Stop everything with `docker compose down` (add `-v` to also delete the
+recorded-answers volume).
 
 ## 4. Break it on purpose
 

@@ -1,0 +1,6 @@
+apiVersion: 1
+providers:
+  - name: ecg-triage
+    folder: ECG triage
+    type: file
+    options: { path: /var/lib/grafana/dashboards }

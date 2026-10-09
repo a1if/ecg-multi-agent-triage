@@ -1,0 +1,35 @@
+# API service (CPU): both agents, the sender CNN-LSTM, the run store. No GPU, no LLM weights.
+# Build from the repo root:  docker build -f backend/Dockerfile.api -t ecg-api backend
+
+# ---- stage 1: install into a virtualenv (build tools stay in this stage) ----
+# The base image is a build argument: Docker Hub by default; a mirror where Docker Hub is unreachable
+# (e.g. BASE_IMAGE=mirror.gcr.io/library/python:3.12-slim, see docker-compose.yml).
+ARG BASE_IMAGE=python:3.12-slim
+FROM ${BASE_IMAGE} AS build
+ENV PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1
+RUN python -m venv /venv
+ENV PATH=/venv/bin:$PATH
+# CPU-only PyTorch: ~200 MB instead of several GB of CUDA libraries the API never uses
+RUN pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cpu
+WORKDIR /src
+COPY pyproject.toml ./
+COPY src ./src
+RUN pip install ".[api]"
+
+# ---- stage 2: the runtime image ----
+FROM ${BASE_IMAGE}
+ENV PATH=/venv/bin:$PATH PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 \
+    RECORDS_DIR=/app/data/records MODELS_DIR=/app/artifacts/models REPLAY_STORE=/app/data/replay/answers.jsonl
+COPY --from=build /venv /venv
+WORKDIR /app
+# Small, versioned, needed at runtime: the sender and adapter checkpoints (13 MB, SHA-256 in the manifest) and
+# the bundled de-identified MIT-BIH records (14 MB).
+COPY artifacts/models ./artifacts/models
+COPY data ./data
+RUN useradd --create-home --uid 10001 app && chown -R app /app/data
+USER app
+EXPOSE 8000
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz')"
+# Cloud Run sets $PORT; one worker: the run store is in memory (see api/runs.py)
+CMD ["sh", "-c", "uvicorn ecg_agent.api.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1"]

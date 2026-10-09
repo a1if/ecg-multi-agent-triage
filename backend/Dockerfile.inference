@@ -1,0 +1,38 @@
+# Inference service (GPU): Gemma 4 E4B + the trained adapter.
+# Build:  docker build -f backend/Dockerfile.inference -t ecg-inference backend
+#
+# The CUDA PyTorch and bitsandbytes wheels carry their own CUDA runtime, so a slim Python base is enough; the host
+# provides only the NVIDIA driver (NVIDIA Container Toolkit locally, the L4 driver on Cloud Run).
+#
+# Gemma's weights are NOT in the image: ~15 GB, and their licence asks each user to accept terms. They come from a
+# volume at $HF_HOME (the local Hugging Face cache, or a Cloud Storage bucket mounted on Cloud Run). With an empty
+# volume, set HF_TOKEN (an account that accepted the Gemma licence) and the first start downloads them.
+
+# The base image is a build argument: Docker Hub by default; a mirror where Docker Hub is unreachable
+# (e.g. BASE_IMAGE=mirror.gcr.io/library/python:3.12-slim, see docker-compose.yml).
+ARG BASE_IMAGE=python:3.12-slim
+FROM ${BASE_IMAGE} AS build
+ENV PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1
+RUN python -m venv /venv
+ENV PATH=/venv/bin:$PATH
+RUN pip install torch==2.11.0 torchvision==0.26.0 --index-url https://download.pytorch.org/whl/cu128
+WORKDIR /src
+COPY pyproject.toml ./
+COPY src ./src
+# Same versions as the paper's measurements (docs/benchmarks.md); a change here goes through the accuracy gate
+RUN pip install ".[inference]" "transformers==5.14.1" "bitsandbytes==0.50.0" "accelerate==1.14.0"
+
+FROM ${BASE_IMAGE}
+ENV PATH=/venv/bin:$PATH PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 \
+    HF_HOME=/models/hf HF_HUB_DISABLE_TELEMETRY=1 \
+    ADAPTER_CHECKPOINT=/app/artifacts/models/p1_item7_mea_r4_seed101.pt MODEL_MANIFEST=/app/artifacts/models/manifest.json
+COPY --from=build /venv /venv
+WORKDIR /app
+COPY artifacts/models ./artifacts/models
+RUN useradd --create-home --uid 10001 app && mkdir -p /models/hf && chown -R app /models
+USER app
+EXPOSE 8001
+# Loading Gemma: ~1 min from a local disk, ~5 min from a Windows folder mounted into Docker Desktop (measured)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=420s \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/readyz')"
+CMD ["sh", "-c", "uvicorn ecg_agent.inference.main:app --host 0.0.0.0 --port ${PORT:-8001} --workers 1"]
