@@ -151,7 +151,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def status(rm: RunManager = Depends(runs)) -> dict:
         health = await rm.receiver.health()
         return {"receiver": s.receiver, "receiver_health": health, "planner": s.planner, "classifier": s.classifier,
-                "uploads": s.allow_uploads, "max_duration_s": s.max_duration_s,
+                "uploads": s.allow_uploads, "max_duration_s": s.max_duration_s, "demo_presets": s.demo_presets,
                 "disclaimer": "Research prototype, not clinical advice."}
 
     @app.get("/v1/records")
@@ -167,6 +167,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         limiter.check(request, "run", s.runs_per_minute)
         if body.scenario and body.scenario not in SCENARIOS:
             raise HTTPException(422, f"unknown scenario {body.scenario!r}")
+        if s.demo_presets:  # the recorded presets: first 5 minutes, 6 reviews
+            body.start_s, body.duration_s, body.max_reviews = 0.0, 300.0, 6
         try:
             run = rm.create(record=body.record, start_s=body.start_s, duration_s=body.duration_s, mode=body.mode,
                             scenario=body.scenario, max_reviews=body.max_reviews)

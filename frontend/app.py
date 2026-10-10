@@ -7,6 +7,8 @@ question) and redraws the page. Anything that must survive a rerun lives in ``st
 ``@st.fragment(run_every=...)`` re-runs just one part of the page on a timer, which is how the live agent trace
 updates without redrawing everything else.
 """
+from pathlib import Path
+
 import streamlit as st
 
 import api
@@ -14,11 +16,15 @@ import ui
 
 st.set_page_config(page_title="ECG multi-agent triage", page_icon="🫀", layout="wide")
 
-pages = st.navigation([
-    st.Page("views/worklist.py", title="Worklist", icon="📋", default=True),
-    st.Page("views/run.py", title="Recording", icon="🫀", url_path="run"),
-    st.Page("views/about.py", title="How it works", icon="🧭", url_path="about"),
-])
+# Page files are located from this file, not from the entry script: on Streamlit Community Cloud the entry point
+# is ../streamlit_app.py, which runs this file.
+VIEWS = Path(__file__).resolve().parent / "views"
+ui.PAGES = {
+    "worklist": st.Page(VIEWS / "worklist.py", title="Worklist", icon="📋", default=True),
+    "run": st.Page(VIEWS / "run.py", title="Recording", icon="🫀", url_path="run"),
+    "about": st.Page(VIEWS / "about.py", title="How it works", icon="🧭", url_path="about"),
+}
+pages = st.navigation(list(ui.PAGES.values()))
 
 with st.sidebar:
     st.caption(ui.DISCLAIMER)

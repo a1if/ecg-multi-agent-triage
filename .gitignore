@@ -35,3 +35,13 @@ node_modules/
 Thumbs.db
 .vscode/
 .idea/
+
+# Terraform: providers and state stay local (state can contain sensitive values); the lock file is committed
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+crash.log
+
+# Assembled deploy folders (backend/scripts/build_hf_space.py)
+build/

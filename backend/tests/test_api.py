@@ -131,3 +131,12 @@ def test_rate_limit_and_unknown_things():
         assert c.post("/v1/runs", json={"record": "100", "duration_s": 30}).status_code == 429
         assert c.get("/v1/runs/nope").status_code == 404
         assert c.post("/v1/runs", json={"record": "100", "scenario": "meteor"}).status_code in (422, 429)
+
+
+def test_demo_presets_pin_runs_to_the_recorded_settings():
+    """The public demo serves recorded Gemma answers only for the recorded presets: runs are pinned to them."""
+    with client(demo_presets=True) as c:
+        assert c.get("/v1/status").json()["demo_presets"] is True
+        r = c.post("/v1/runs", json={"record": "233", "start_s": 123, "duration_s": 60, "max_reviews": 2}).json()
+        assert (r["params"]["start_s"], r["params"]["duration_s"]) == (0.0, 300.0)
+        assert wait(c, r["id"])["status"] == "complete"

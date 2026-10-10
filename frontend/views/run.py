@@ -10,7 +10,7 @@ import ui
 run_id = st.query_params.get("run") or st.session_state.get("run_id")
 if not run_id:
     st.info("Open a recording from the worklist.")
-    st.page_link("views/worklist.py", label="Go to the worklist", icon="📋")
+    st.page_link(ui.PAGES["worklist"], label="Go to the worklist", icon="📋")
     st.stop()
 st.query_params["run"] = run_id  # the URL now points at this recording: shareable, survives a refresh
 
