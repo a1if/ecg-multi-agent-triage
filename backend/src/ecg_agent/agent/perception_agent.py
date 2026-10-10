@@ -271,6 +271,12 @@ class PerceptionAgent:
         self.summary = {**record_summary(out.events, len(b.signal) / B.FS),
                         "strategy": self.best.strategy["why"], "quality": self.best.quality,
                         "quality_warnings": warnings, "unreadable_windows": bad}
+        # Input-drift metrics: what this deployment is being given (ops/alerts.yml watches them).
+        metrics.input_noise.observe(self.best.quality["noise_median"])
+        metrics.windows.labels(readable="true").inc(len(ws) - len(bad))
+        metrics.windows.labels(readable="false").inc(len(bad))
+        for label, count in self.summary["classes"].items():
+            metrics.beats.labels(label=label).inc(count)
         self.ready = True
         await self.tracer.emit(NAME, "node", f"Screened {len(out.events)} beats into {len(ws)} windows"
                                + (f", {len(bad)} unreadable" if bad else ""), summary=self.summary)

@@ -143,6 +143,12 @@ In PowerShell set them first: `$env:BASE_IMAGE = "mirror.gcr.io/library/python:3
 `$env:HUB_MIRROR = "mirror.gcr.io/"`. Stop everything with `docker compose down` (add `-v` to also delete the
 recorded-answers volume).
 
+MLflow (model registry and evaluation history) has its own profile; see [mlops.md](mlops.md):
+
+```bash
+docker compose --profile mlops up -d mlflow
+```
+
 ## 4. Break it on purpose
 
 ```bash

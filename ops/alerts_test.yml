@@ -1,0 +1,143 @@
+# Unit tests for ops/alerts.yml:  promtool test rules ops/alerts_test.yml   (runs in CI)
+# Each case feeds synthetic metric histories (one sample per minute) and checks which alerts fire, and which must not.
+rule_files: [alerts.yml]
+evaluation_interval: 1m
+
+tests:
+  - name: under-triage above the baseline fires; at the baseline it does not
+    interval: 1m
+    input_series:
+      # 1 in 3 answers too low (33%): fires
+      - series: 'agent_guardrail_total{channel="adapter", verdict="under_triage"}'
+        values: '0+1x90'
+      - series: 'agent_guardrail_total{channel="adapter", verdict="agree"}'
+        values: '0+2x90'
+    alert_rule_test:
+      - eval_time: 80m
+        alertname: LLMUnderTriageRateHigh
+        exp_alerts:
+          - exp_labels: { severity: warning }
+            exp_annotations:
+              summary: 'Receiver answers below the screening tier: 33.33% in the last hour (baseline ~9%)'
+              runbook: 'Compare by channel (Grafana: guardrail verdicts). Check for a model, adapter or library change (manifest SHA-256, image tag) and for input drift.'
+
+  - name: under-triage at the measured baseline (~9%) stays quiet
+    interval: 1m
+    input_series:
+      - series: 'agent_guardrail_total{channel="filtered", verdict="under_triage"}'
+        values: '0+1x90'
+      - series: 'agent_guardrail_total{channel="filtered", verdict="agree"}'
+        values: '0+10x90'
+    alert_rule_test:
+      - eval_time: 80m
+        alertname: LLMUnderTriageRateHigh
+        exp_alerts: []
+
+  - name: a high rate on very few answers stays quiet (minimum volume)
+    interval: 1m
+    input_series:
+      - series: 'agent_guardrail_total{channel="adapter", verdict="under_triage"}'
+        values: '0 0 0 1 1 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3'
+      - series: 'agent_guardrail_total{channel="adapter", verdict="agree"}'
+        values: '0 0 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2'
+    alert_rule_test:
+      - eval_time: 70m
+        alertname: LLMUnderTriageRateHigh
+        exp_alerts: []
+
+  - name: falling back to the rule fires only where the GPU is meant to answer
+    interval: 1m
+    input_series:
+      - series: 'receiver_latency_seconds_count{channel="adapter", source="offline-rule"}'
+        values: '0+3x30'
+      - series: 'receiver_latency_seconds_count{channel="adapter", source="gemma"}'
+        values: '0+1x30'
+      - series: 'agent_receiver_mode{mode="http"}'
+        values: '1x30'
+    alert_rule_test:
+      - eval_time: 25m
+        alertname: ReceiverFallingBackToRule
+        exp_alerts:
+          - exp_labels: { severity: critical }
+            exp_annotations:
+              summary: '75% of answers from the rule: the GPU service is not answering'
+              runbook: Check the inference service (readiness, cold start, GPU quota). Answers stay safe (labelled rule) but lose explanations.
+
+  - name: the same fallback in a replay deployment is expected and stays quiet
+    interval: 1m
+    input_series:
+      - series: 'receiver_latency_seconds_count{channel="adapter", source="offline-rule"}'
+        values: '0+3x30'
+      - series: 'agent_receiver_mode{mode="replay"}'
+        values: '1x30'
+    alert_rule_test:
+      - eval_time: 25m
+        alertname: ReceiverFallingBackToRule
+        exp_alerts: []
+
+  - name: a failed run fires at once
+    interval: 1m
+    input_series:
+      - series: 'agent_runs_total{status="failed"}'
+        values: '0 0 0 1 1 1'
+      - series: 'agent_runs_total{status="complete"}'
+        values: '0 1 2 3 4 5'
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: RunsFailing
+        exp_alerts:
+          - exp_labels: { severity: critical }
+            exp_annotations:
+              summary: 1 run(s) failed in the last 15 minutes
+              runbook: A failed run is reported as failed, never as a tier; read its trace (run status error) and the API logs.
+
+  - name: a spike of unreadable recordings fires
+    interval: 1m
+    input_series:
+      - series: 'agent_runs_total{status="unreadable"}'
+        values: '0+1x80'
+      - series: 'agent_runs_total{status="complete"}'
+        values: '0+1x80'
+    alert_rule_test:
+      - eval_time: 70m
+        alertname: UnreadableRecordingsSpike
+        exp_alerts:
+          - exp_labels: { severity: warning }
+            exp_annotations:
+              summary: 50% of recordings unreadable in the last hour (baseline 0)
+              runbook: Look at the unreadable runs' reasons (noise, flat, clipping). An input-pipeline problem, not a model one.
+
+  - name: sustained input noise above 0.03 fires; clean input does not
+    interval: 1m
+    input_series:
+      # every recording lands in the 0.03-0.05 bucket: median ~0.04
+      - series: 'perception_input_noise_bucket{le="0.005"}'
+        values: '0x500'
+      - series: 'perception_input_noise_bucket{le="0.01"}'
+        values: '0x500'
+      - series: 'perception_input_noise_bucket{le="0.02"}'
+        values: '0x500'
+      - series: 'perception_input_noise_bucket{le="0.03"}'
+        values: '0x500'
+      - series: 'perception_input_noise_bucket{le="0.05"}'
+        values: '0+1x500'
+      - series: 'perception_input_noise_bucket{le="0.08"}'
+        values: '0+1x500'
+      - series: 'perception_input_noise_bucket{le="0.15"}'
+        values: '0+1x500'
+      - series: 'perception_input_noise_bucket{le="0.3"}'
+        values: '0+1x500'
+      - series: 'perception_input_noise_bucket{le="1.0"}'
+        values: '0+1x500'
+      - series: 'perception_input_noise_bucket{le="+Inf"}'
+        values: '0+1x500'
+      - series: 'perception_input_noise_count'
+        values: '0+1x500'
+    alert_rule_test:
+      - eval_time: 400m
+        alertname: InputNoiseDrift
+        exp_alerts:
+          - exp_labels: { severity: warning }
+            exp_annotations:
+              summary: Median input noise 0.04 over 6 h (clean baseline < 0.02)
+              runbook: 'Classifier sensitivity drops with noise before anything is marked unreadable: check recording hardware/settings.'

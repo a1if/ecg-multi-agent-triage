@@ -23,6 +23,7 @@ from ecg_agent.agent.reasoning_agent import ReasoningAgent
 from ecg_agent.api.settings import Settings
 from ecg_agent.core.rule import RANK
 from ecg_agent.core.sender import Sender
+from ecg_agent.observability import metrics
 from ecg_agent.receiver.clients import HttpReceiver, OfflineReceiver, ReplayReceiver
 from ecg_agent.signal.stress import SCENARIOS
 
@@ -70,6 +71,7 @@ class RunManager:
         self.sender = Sender(settings.models_dir / "cnn_lstm_rr_seed0.pt", device="cpu")
         self.manifest_path = settings.models_dir / "manifest.json"
         self.receiver = build_receiver(settings)
+        metrics.receiver_mode.labels(mode=settings.receiver).set(1)  # lets alerts tell "GPU down" from "no GPU here"
         self.runs: OrderedDict[str, Run] = OrderedDict()
         self.slots = asyncio.Semaphore(settings.max_concurrent_runs)
 

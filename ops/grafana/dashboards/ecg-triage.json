@@ -2,7 +2,7 @@
  "uid": "ecg-triage",
  "title": "ECG triage: agents and receiver",
  "schemaVersion": 39,
- "version": 1,
+ "version": 2,
  "time": {
   "from": "now-1h",
   "to": "now"
@@ -293,6 +293,165 @@
      "refId": "B",
      "expr": "inference_inflight",
      "legendFormat": "requests waiting or running",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    }
+   ]
+  },
+  {
+   "id": 100,
+   "type": "timeseries",
+   "title": "Input noise: median per recording (6 h)",
+   "description": "Data drift: clean records sit below 0.02; accuracy starts to fall above 0.03.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "gridPos": {
+    "h": 8,
+    "w": 12,
+    "x": 0,
+    "y": 32
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "histogram_quantile(0.5, sum by (le) (rate(perception_input_noise_bucket[6h])))",
+     "legendFormat": "median noise",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    },
+    {
+     "refId": "B",
+     "expr": "0.03",
+     "legendFormat": "warning threshold",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    }
+   ]
+  },
+  {
+   "id": 101,
+   "type": "timeseries",
+   "title": "Unreadable share: recordings and windows (1 h)",
+   "description": "Rising = the inputs changed (devices, electrodes), not the patients.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "gridPos": {
+    "h": 8,
+    "w": 12,
+    "x": 12,
+    "y": 32
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum(increase(agent_runs_total{status=\"unreadable\"}[1h])) / sum(increase(agent_runs_total[1h]))",
+     "legendFormat": "recordings",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    },
+    {
+     "refId": "B",
+     "expr": "sum(increase(perception_windows_total{readable=\"false\"}[1h])) / sum(increase(perception_windows_total[1h]))",
+     "legendFormat": "windows",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    }
+   ]
+  },
+  {
+   "id": 102,
+   "type": "timeseries",
+   "title": "Beat class mix (1 h)",
+   "description": "What the perception agent is seeing. A sudden shift with no clinical reason points at the sender or the inputs.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "gridPos": {
+    "h": 8,
+    "w": 12,
+    "x": 0,
+    "y": 40
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum by (label) (increase(perception_beats_total[1h])) / ignoring(label) group_left sum(increase(perception_beats_total[1h]))",
+     "legendFormat": "{{label}}",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    }
+   ]
+  },
+  {
+   "id": 103,
+   "type": "timeseries",
+   "title": "LLM disagreement with screening (1 h)",
+   "description": "Model-quality drift per channel; real-Gemma baseline about 9% under-triage.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "gridPos": {
+    "h": 8,
+    "w": 12,
+    "x": 12,
+    "y": 40
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum by (channel) (increase(agent_guardrail_total{verdict!=\"agree\"}[1h])) / sum by (channel) (increase(agent_guardrail_total[1h]))",
+     "legendFormat": "{{channel}}",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    },
+    {
+     "refId": "B",
+     "expr": "0.20",
+     "legendFormat": "alert threshold (under-triage)",
      "datasource": {
       "type": "prometheus",
       "uid": "prom"

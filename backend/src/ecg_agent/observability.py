@@ -23,6 +23,12 @@ metrics = SimpleNamespace(
                               buckets=(256, 512, 768, 1024, 1536, 2048, 3072, 4096)),
     receiver_latency=Histogram("receiver_latency_seconds", "Receiver decision latency", ["channel", "source"],
                                buckets=(0.05, 0.1, 0.5, 1, 2, 4, 8, 16, 32, 64)),
+    # Input (data) drift: what the perception agent is being given, recording by recording.
+    input_noise=Histogram("perception_input_noise", "Median share of beat energy above 40 Hz, per recording",
+                          buckets=(0.005, 0.01, 0.02, 0.03, 0.05, 0.08, 0.15, 0.3, 1.0)),
+    windows=Counter("perception_windows_total", "Screened windows by readability", ["readable"]),
+    beats=Counter("perception_beats_total", "Beats by predicted class", ["label"]),
+    receiver_mode=Gauge("agent_receiver_mode", "Receiver this deployment is configured to use (1 = active)", ["mode"]),
     gpu_mem=Gauge("inference_gpu_memory_bytes", "Peak GPU memory of the last request"),
     inflight=Gauge("inference_inflight", "Requests waiting for or using the GPU"),
 )

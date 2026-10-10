@@ -45,3 +45,6 @@ crash.log
 
 # Assembled deploy folders (backend/scripts/build_hf_space.py)
 build/
+
+# MLflow tracking database and artifacts (rebuilt by backend/scripts/mlops_registry.py)
+mlops/
