@@ -22,13 +22,14 @@ class TriageRequest(BaseModel):
     mode: Literal["decision", "full"] = "full"  # "decision" stops at the tier (decide early, explain later)
     sender_sha256: str | None = None  # adapter channel: which sender made the vectors (the version contract)
 
-    def cache_key(self) -> str:
-        """Content hash of what the receiver actually sees on this channel."""
+    def cache_key(self, adapter_sha256: str | None = None) -> str:
+        """Content hash of what the receiver actually sees on this channel. On the adapter channel that includes the
+        adapter itself: the same vectors through a different adapter are different virtual tokens."""
         from ecg_agent.core.prompts import compact_prompt, filtered_prompt
 
         if self.channel == "adapter":
             body = json.dumps([[round(v, 5) for v in row] for row in self.vectors or []]) + json.dumps(
-                [e["clinical_flags"]["consecutive_abnormal_beats"] for e in self.events])
+                [e["clinical_flags"]["consecutive_abnormal_beats"] for e in self.events]) + f"|{adapter_sha256}"
         else:
             body = (compact_prompt if self.channel == "compact" else filtered_prompt)(self.events)
         return hashlib.sha256(f"{self.channel}|{self.mode}|{body}".encode()).hexdigest()

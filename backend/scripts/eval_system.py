@@ -34,6 +34,7 @@ from ecg_agent.agent.perception_agent import PerceptionAgent, Source, load_mitdb
 from ecg_agent.agent.planner import RulePlanner
 from ecg_agent.agent.policy import Policy
 from ecg_agent.agent.reasoning_agent import ReasoningAgent
+from ecg_agent.core.models import deployed_adapter
 from ecg_agent.core.rule import RANK
 from ecg_agent.core.sender import Sender
 from ecg_agent.receiver.clients import FaultyReceiver, OfflineReceiver
@@ -174,7 +175,7 @@ def gemma(minutes: float) -> dict:
     from ecg_agent.receiver.local import LocalGemmaReceiver
 
     t0 = time.perf_counter()
-    receiver = LocalGemmaReceiver(GemmaEngine(MODELS / "p1_item7_mea_r4_seed101.pt"))
+    receiver = LocalGemmaReceiver(GemmaEngine(deployed_adapter(MODELS)[0]))
     load_s = round(time.perf_counter() - t0, 1)
     sender = Sender(MODELS / "cnn_lstm_rr_seed0.pt")
     runs, questions = [], []

@@ -38,9 +38,12 @@ ROOT = Path(__file__).resolve().parents[3]
 
 
 def default_engine():
+    from ecg_agent.core.models import deployed_adapter
     from ecg_agent.receiver.gemma import GemmaEngine
 
-    return GemmaEngine(os.environ.get("ADAPTER_CHECKPOINT", ROOT / "artifacts/models/p1_item7_mea_r4_seed101.pt"))
+    # The manifest's folder, not this file's: installed into a venv, this file is nowhere near artifacts/.
+    models = Path(os.environ["MODEL_MANIFEST"]).parent if os.environ.get("MODEL_MANIFEST") else ROOT / "artifacts/models"
+    return GemmaEngine(os.environ.get("ADAPTER_CHECKPOINT") or deployed_adapter(models)[0])
 
 
 def create_app(engine_factory: Callable = default_engine, manifest_path: str | Path | None = None) -> FastAPI:
