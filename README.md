@@ -6,8 +6,11 @@ deserve attention, triages them, and answers the clinician's questions. They tal
 learned **virtual tokens**, and a deterministic orchestrator enforces what each may say. A guardrail never lets an
 LLM answer fall below the classifier's screening tier, and a clinician signs off.
 
-> **Status: work in progress.** Agents, services and evaluation are built and tested; frontend, containers, CI/CD and
-> cloud deployment are next. Research prototype, not a medical device or clinical advice.
+**Live demo: https://ecg-multi-agent-triage.streamlit.app** (free hosting; it may take a moment to wake up). The
+reasoning agent's answers there are real Gemma answers recorded on a GPU for the demo presets, and each answer says
+where it came from. Research prototype, not a medical device or clinical advice.
+
+[![ci](https://github.com/a1if/ecg-multi-agent-triage/actions/workflows/ci.yml/badge.svg)](https://github.com/a1if/ecg-multi-agent-triage/actions/workflows/ci.yml)
 
 Built on the research in
 [Heterogeneous-Multi-Agent-Edge-AI-for-Clinical-Decision-Support](https://github.com/a1if/Heterogeneous-Multi-Agent-Edge-AI-for-Clinical-Decision-Support)
