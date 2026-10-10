@@ -15,7 +15,7 @@ ui.status_banner(st.session_state.get("status"))
 
 def open_run(run_id: str) -> None:
     st.session_state["run_id"] = run_id
-    st.switch_page("views/run.py")
+    st.switch_page(ui.PAGES["run"])
 
 
 # ----- new run -----

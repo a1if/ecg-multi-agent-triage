@@ -14,6 +14,7 @@ SOURCE_LABEL = {"gemma": "Gemma (live)", "replay": "Gemma (recorded answer)", "o
                 "mock": "simulated", "rule": "rule"}
 
 DISCLAIMER = "Research prototype, not a medical device and not clinical advice."
+PAGES: dict = {}  # set by app.py: name -> st.Page, so pages can link to each other wherever the entry point is
 
 
 def tier_badge(tier: str | None) -> str:

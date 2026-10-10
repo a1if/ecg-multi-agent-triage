@@ -1,4 +1,24 @@
-# Deploying to Google Cloud
+# Deploying
+
+## The public demo: Streamlit Community Cloud (free, no card)
+
+The live demo runs on Streamlit Community Cloud from this repository's `streamlit_app.py`: the API runs inside the
+Streamlit process (a background thread on 127.0.0.1 only) because Community Cloud hosts one Streamlit app and no
+Docker. The reasoning agent serves the Gemma answers recorded on a GPU (`backend/data/replay/answers.jsonl`) for the
+demo presets, labelled as recorded. `requirements.txt` pins the numeric libraries to the API image's versions:
+recorded answers are matched by exact numbers. Measured in a fresh Python 3.12 install like Community Cloud's:
+137/137 answers served from the recordings.
+
+1. Sign in at https://share.streamlit.io with GitHub.
+2. *Create app* → *Deploy a public app from GitHub*: repository `a1if/ecg-multi-agent-triage`, branch `main`,
+   main file `streamlit_app.py`; *Advanced settings* → Python **3.12**. Deploy (the first build takes a few minutes).
+3. The app sleeps after a period without visitors; the next visitor wakes it with one click.
+
+Hosting attempts that did not fit, for the record: Google Cloud Run (needs a billing account; this card required a
+refundable prepayment), Hugging Face Docker Spaces (free CPU hardware now needs a PRO subscription for Docker and
+Gradio Spaces). The Hugging Face Space is still buildable (`deploy/hf-space`, `backend/scripts/build_hf_space.py`).
+
+# Google Cloud (defined as code, not running)
 
 The public demo runs on **CPU only**: the API and frontend on Cloud Run, serving **real Gemma answers recorded on a
 GPU** for fixed presets (each bundled record, first 5 minutes) and labelling them as recorded. The GPU service exists

@@ -1,0 +1,11 @@
+# Root files (streamlit_app.py). Same rules as backend/pyproject.toml and frontend/ruff.toml, so local and CI agree.
+line-length = 125
+target-version = "py311"
+extend-exclude = ["backend", "frontend", "build", "infra"]  # they have their own configs
+
+[lint]
+select = ["E", "F", "W", "I", "B", "UP", "BLE"]
+ignore = ["E741", "B008"]
+
+[lint.isort]
+known-first-party = ["ecg_agent"]

@@ -1,0 +1,15 @@
+# Streamlit Community Cloud (streamlit_app.py): the API and the frontend in one Python environment.
+# Elsewhere each service has its own dependencies (backend/pyproject.toml, frontend/requirements.txt).
+#
+# The numeric libraries are pinned to the versions inside the API Docker image, where the demo's Gemma answers
+# were recorded: answers are matched by exact numbers, which agree only across identical versions.
+# Python 3.12 (choose it in the app's advanced settings), as in the image.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.11.0+cpu
+numpy==2.5.3
+scipy==1.18.1
+pandas==3.0.6
+./backend[api]
+streamlit>=1.65.0
+plotly>=7.1.0
+httpx>=0.28.1

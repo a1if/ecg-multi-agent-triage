@@ -36,7 +36,7 @@ jobs:
       - name: "Ruff (backend, rules from pyproject.toml)"
         run: ruff check backend/src backend/tests backend/scripts
       - name: Ruff (frontend)
-        run: ruff check frontend
+        run: ruff check frontend streamlit_app.py
 
   backend-tests:
     runs-on: ubuntu-latest
