@@ -200,18 +200,29 @@ with tab_find:
                 st.caption(f"Explained by {ui.source_label(e['explained_by'])}"
                            + (f" · {e['note']}" if e.get("note") else ""))
         with c2:
-            with st.form(f"ovr_{wid}"):
-                st.markdown("**Clinician override** (recorded with your name and reason)")
-                tier = st.selectbox("New tier", ["urgent", "priority", "routine"])
+            f = findings[wid]
+            current = f["override"]["to_tier"] if f.get("override") else f["final_tier"]
+            with st.form(f"ovr_{wid}", clear_on_submit=True):
+                st.markdown(f"**Clinician override** · {wid} is {ui.tier_badge(current)}")
+                if f.get("override"):
+                    o = f["override"]
+                    st.caption(f"Overridden {o['from_tier']} → {o['to_tier']} by {o['clinician']}: {o['reason']}")
+                # Only the other tiers: an override must change something. Lowering a tier is allowed (it is the
+                # clinician's call, unlike the agents, which can never go below screening); it is recorded either way.
+                tier = st.selectbox("New tier", [t for t in ("urgent", "priority", "routine") if t != current])
                 who = st.text_input("Your name")
-                why = st.text_input("Reason")
+                why = st.text_input("Reason", placeholder="e.g. artefact on review of the strip")
                 if st.form_submit_button("Override"):
-                    try:
-                        api.override(run_id, wid, tier, who, why)
-                        st.success("Recorded in the audit trail.")
-                        st.rerun()
-                    except api.ApiError as e:
-                        st.error(e.detail)
+                    if not who.strip() or not why.strip():
+                        st.error("An override needs your name and a reason.")
+                    else:
+                        try:
+                            api.override(run_id, wid, tier, who, why)
+                            # a toast survives the rerun; st.success would vanish with it
+                            st.toast(f"{wid}: {current} → {tier}, recorded in the audit trail.", icon="🩺")
+                            st.rerun()
+                        except api.ApiError as e:
+                            st.error(e.detail)
 
 # ----- questions -----
 with tab_ask:
@@ -238,6 +249,12 @@ with tab_ask:
 # ----- audit -----
 with tab_audit:
     rows = api.audit(run_id)
+    decisions = [r for r in rows if r.get("verdict") == "clinician_override"]
+    if decisions:  # human decisions first: they are what a reviewer of this run looks for
+        st.markdown("**Clinician decisions**")
+        for r in decisions:
+            st.markdown(f"- {r['window_id']}: {ui.tier_badge(r['from_tier'])} → {ui.tier_badge(r['to_tier'])} "
+                        f"by **{r['clinician']}**: {r['reason']}")
     st.caption("Every message the orchestrator checked, with its verdict, and every clinician override, in order.")
     st.dataframe(pd.DataFrame([{
         "verdict": r.get("verdict"), "from": r.get("from", r.get("clinician", "")), "to": r.get("to", ""),

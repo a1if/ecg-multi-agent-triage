@@ -274,6 +274,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             return run.orch.override(wid, body.tier, body.clinician, body.reason)
         except KeyError:
             raise HTTPException(404, f"{wid} has no finding") from None
+        except ValueError as e:  # the orchestrator's rules: a valid tier that changes something, a name, a reason
+            raise HTTPException(422, str(e)) from None
 
     @app.get("/healthz")
     async def healthz() -> dict:

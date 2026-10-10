@@ -121,6 +121,10 @@ def test_override_is_a_recorded_human_action(sender, policy):
     e = orch.override(wid, "routine", "Dr A", "artefact on review of the strip")
     assert e["from_tier"] != "routine" and r.findings[wid]["override"]["clinician"] == "Dr A"
     assert orch.audit[-1]["verdict"] == "clinician_override"
+    with pytest.raises(ValueError, match="already routine"):
+        orch.override(wid, "routine", "Dr B", "same again")  # an override must change the tier
+    e2 = orch.override(wid, "priority", "Dr B", "second opinion")
+    assert e2["from_tier"] == "routine"  # chains from the previous override, not the agents' tier
 
 
 @pytest.mark.parametrize("text,ids", [("w3 and w001", ["w003", "w001"]), ("around 0:45", ["w001"]),

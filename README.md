@@ -10,7 +10,7 @@ research prototype, not a medical device or clinical advice
 ![python](https://img.shields.io/badge/python-3.12-blue)
 ![licence](https://img.shields.io/badge/licence-MIT-green)
 
-![A recording in the app: summary, findings and the ECG with the windows the reasoning agent reviewed](docs/images/recording.png)
+![One run, start to finish: pick a recording, the agents work, the result, their conversation, a question answered and one refused, a clinician override, the audit trail](docs/images/demo.gif)
 
 ## The problem
 

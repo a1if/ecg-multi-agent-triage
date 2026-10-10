@@ -85,9 +85,14 @@ def test_questions_explain_and_override(done):
     bad = c.post(f"/v1/runs/{d['id']}/windows/{wid}/override", json={"tier": "routine", "clinician": "Dr A",
                                                                       "reason": ""})
     assert bad.status_code == 422  # a reason is required
+    tier = d["findings"][wid]["final_tier"]
+    same = c.post(f"/v1/runs/{d['id']}/windows/{wid}/override",
+                  json={"tier": tier, "clinician": "Dr A", "reason": "no change"})
+    assert same.status_code == 422 and "already" in same.json()["detail"]  # refused with the reason, not a 500
+    new = "routine" if tier != "routine" else "priority"
     ok = c.post(f"/v1/runs/{d['id']}/windows/{wid}/override",
-                json={"tier": "priority", "clinician": "Dr A", "reason": "reviewed the strip"}).json()
-    assert ok["to_tier"] == "priority"
+                json={"tier": new, "clinician": "Dr A", "reason": "reviewed the strip"}).json()
+    assert ok["to_tier"] == new and ok["from_tier"] == tier
     assert c.get(f"/v1/runs/{d['id']}/audit").json()[-1]["verdict"] == "clinician_override"
 
 
