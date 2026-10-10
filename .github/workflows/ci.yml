@@ -41,6 +41,9 @@ jobs:
         run: |
           docker run --rm -v "$PWD/ops:/ops:ro" -w /ops --entrypoint promtool prom/prometheus:v3.5.0 check rules alerts.yml
           docker run --rm -v "$PWD/ops:/ops:ro" -w /ops --entrypoint promtool prom/prometheus:v3.5.0 test rules alerts_test.yml
+      # An invalid workflow file never shows up as a failed job: GitHub fails it on every push with "No jobs were run".
+      - name: Workflow files (actionlint)
+        run: docker run --rm -v "$PWD:/repo:ro" -w /repo rhysd/actionlint:1.7.7
 
   backend-tests:
     runs-on: ubuntu-latest
@@ -147,8 +150,8 @@ jobs:
           image=$(echo "${{ steps.meta.outputs.tags }}" | head -1)
           port=$([ "${{ matrix.name }}" = api ] && echo 8000 || echo 8501)
           path=$([ "${{ matrix.name }}" = api ] && echo /readyz || echo /_stcore/health)
-          docker run -d --name smoke -p $port:$port "$image"
-          for i in $(seq 1 30); do curl -sf "http://localhost:$port$path" && break; sleep 2; done
+          docker run -d --name smoke -p "$port:$port" "$image"
+          for _ in $(seq 1 30); do curl -sf "http://localhost:$port$path" && break; sleep 2; done
           curl -sf "http://localhost:$port$path"
           test "$(docker exec smoke id -un)" = app  # never root
       - name: Vulnerability scan (report only)
