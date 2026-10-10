@@ -125,8 +125,11 @@ class ReplayReceiver:
     """Answers recorded from real Gemma runs, keyed by what the receiver saw. Wraps a live receiver: hits are served
     from the store, misses go to the live receiver (if any) and are recorded, or to ``fallback`` when it is down."""
 
-    def __init__(self, store: str | Path, live=None, fallback=None, record: bool = True):
+    def __init__(self, store: str | Path, live=None, fallback=None, record: bool = True,
+                 adapter_sha256: str | None = None):
         self.path = Path(store)
+        self.adapter = adapter_sha256  # part of every adapter-channel key: a promoted adapter never gets old answers
+        self.misses = 0  # requests the recording could not answer (in a replay-only demo: answered by the rule)
         self.live, self.fallback, self.record = live, fallback or OfflineReceiver(), record
         self.name = f"replay+{live.name}" if live else "replay"
         self._lock = threading.Lock()
@@ -150,9 +153,10 @@ class ReplayReceiver:
                 f.write(json.dumps({"key": key, "value": value}) + "\n")
 
     async def triage(self, req: TriageRequest) -> TriageResult:
-        key = "t:" + req.cache_key()
+        key = "t:" + req.cache_key(self.adapter)
         if key in self._data:
             return TriageResult(**{**self._data[key], "source": "replay"})
+        self.misses += 1
         if self.live is not None:
             try:
                 res = await self.live.triage(req)
@@ -163,9 +167,10 @@ class ReplayReceiver:
         return await self.fallback.triage(req)
 
     async def explain(self, req: ExplainRequest) -> TriageResult:
-        key = f"e:{req.tier}:" + req.cache_key()
+        key = f"e:{req.tier}:" + req.cache_key(self.adapter)
         if key in self._data:
             return TriageResult(**{**self._data[key], "source": "replay"})
+        self.misses += 1
         if self.live is not None:
             try:
                 res = await self.live.explain(req)
@@ -179,6 +184,7 @@ class ReplayReceiver:
         key = "g:" + _gen_key(req)
         if key in self._data:
             return GenerateResult(**{**self._data[key], "source": "replay"})
+        self.misses += 1
         if self.live is not None:
             try:
                 res = await self.live.generate(req)
@@ -191,7 +197,7 @@ class ReplayReceiver:
 
     async def health(self) -> dict:
         live = await self.live.health() if self.live else {"ok": False}
-        return {"ok": True, "replay_entries": len(self._data), "live": live}
+        return {"ok": True, "replay_entries": len(self._data), "replay_misses": self.misses, "live": live}
 
 
 class FaultyReceiver:

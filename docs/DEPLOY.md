@@ -9,6 +9,13 @@ demo presets, labelled as recorded. `requirements.txt` pins the numeric librarie
 recorded answers are matched by exact numbers. Measured in a fresh Python 3.12 install like Community Cloud's:
 137/137 answers served from the recordings.
 
+**Re-recording** (after a model promotion, or any change to what Gemma is asked): start the API with `RECEIVER=http`
+and the GPU service (`docker compose --profile gpu up`), run `backend/scripts/record_demo_answers.py`, copy the store
+out of the container, then restart the API with `RECEIVER=replay` and run `record_demo_answers.py --verify`. The
+replay store counts every request it could not answer (`replay_misses` in `/v1/status`), and `--verify` fails unless
+all presets, explanations, questions and summaries come from the recording. Adapter-channel answers are keyed by the
+adapter's SHA-256, so a promoted adapter can never be served the previous adapter's answers.
+
 1. Sign in at https://share.streamlit.io with GitHub.
 2. *Create app* → *Deploy a public app from GitHub*: repository `a1if/ecg-multi-agent-triage`, branch `main`,
    main file `streamlit_app.py`; *Advanced settings* → Python **3.12**. Deploy (the first build takes a few minutes).

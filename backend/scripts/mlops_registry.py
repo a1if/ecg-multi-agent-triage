@@ -23,6 +23,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -34,9 +35,9 @@ ROOT = Path(__file__).resolve().parents[1]
 MODELS = ROOT / "artifacts" / "models"
 RESULTS = ROOT / "results"
 PAPER = "https://github.com/a1if/Heterogeneous-Multi-Agent-Edge-AI-for-Clinical-Decision-Support"
-CHAMPION_REASON = ("Seed 101 is the adapter the paper's measurements, the inference benchmarks and all recorded demo "
-                   "answers use. Seeds 202 and 303 score higher on the small validation split (about 30 windows per "
-                   "size); promotion needs an evaluation on the held-out test windows and re-recording the demo.")
+CHAMPION_REASON = ("Promoted from seed 101 by scripts/promotion_gate.py on held-out patients (MIT-BIH DS2, 795 windows, "
+                   "22 patients, paired bootstrap over patients): balanced accuracy +0.050 [+0.020, +0.079] and urgent "
+                   "recall not worse. Seed 202 failed the gate (urgent recall -0.083). Demo answers re-recorded with it.")
 
 
 def sha256(path: Path) -> str:
@@ -102,7 +103,7 @@ def build(paper_repo: Path | None) -> None:
     if paper_repo:
         adapter_files += [p for p in sorted((paper_repo / "reasoning" / "checkpoints").glob("p1_item7_mea_r4_seed*.pt"))
                           if sha256(p) != manifest["adapter"]["sha256"]]
-    adapter_versions = {}
+    adapter_versions, seed_versions = {}, {}
     for ap in adapter_files:
         ck = torch.load(ap, map_location="cpu", weights_only=False)
         sd = ck["adapter_state_dict"]
@@ -117,6 +118,11 @@ def build(paper_repo: Path | None) -> None:
                       "trained_for_sender_sha256": manifest["adapter"]["trained_for_sender_sha256"]},
                      "Validation metrics from training (small split: about 30 windows per size).")
         adapter_versions[v] = deployed
+        seed_versions[str(ck["seed"])] = v
+        # Roles follow the manifest: after a promotion the old champion becomes a challenger on the next build.
+        client.set_model_version_tag("ecg-adapter", v, "role", "champion" if deployed else "challenger")
+        if not deployed and "champion_reason" in client.get_model_version("ecg-adapter", v).tags:
+            client.delete_model_version_tag("ecg-adapter", v, "champion_reason")
 
     # ---- champion aliases: what the manifest (deployment) pins ----
     champ = next(v for v, d in adapter_versions.items() if d)
@@ -126,18 +132,24 @@ def build(paper_repo: Path | None) -> None:
 
     # ---- evaluations, linked to the versions they tested ----
     mlflow.set_experiment("evaluation")
-    lineage = {"model.sender.version": sender_v, "model.adapter.version": champ,
-               "model.sender.sha256": manifest["sender"]["sha256"], "model.adapter.sha256": manifest["adapter"]["sha256"]}
-    logged = {r.data.tags.get("result_file") for r in client.search_runs(
-        [client.get_experiment_by_name("evaluation").experiment_id], max_results=500)}
+    lineage = {"model.sender.version": sender_v, "model.sender.sha256": manifest["sender"]["sha256"]}
+    # Skip by content, not name: a re-run of eval_gemma.json after a promotion is a new result under the same name.
+    logged = {r.data.tags.get("result_sha256") for r in client.search_runs(
+        [client.get_experiment_by_name("evaluation").experiment_id], max_results=1000)}
     for path in sorted(RESULTS.glob("*.json")):
-        if path.name in logged or not path.name.startswith(("eval_", "bench_", "chaos_")):
+        if sha256(path) in logged or not path.name.startswith(("eval_", "bench_", "chaos_", "promotion_")):
             continue
+        # A result names the adapter seed it measured (e.g. bench_baseline_5070_seed101.json); otherwise it is the
+        # current champion's. Linking it to the wrong version would make the history say something it does not.
+        seed = re.search(r"seed(\d+)", path.stem)
+        adapter_v = seed_versions.get(seed.group(1), champ) if seed else champ
         d = json.loads(path.read_text())
         m = {k: v for k, v in flat("", {k: v for k, v in d.items() if k not in ("rows", "runs", "questions", "attempts",
                                                                                   "windows")}).items()}
         with mlflow.start_run(run_name=path.stem):
-            mlflow.set_tags({**lineage, "result_file": path.name})
+            mlflow.set_tags({**lineage, "model.adapter.version": adapter_v,
+                             "model.adapter.sha256": client.get_model_version("ecg-adapter", adapter_v).tags["sha256"],
+                             "result_file": path.name, "result_sha256": sha256(path)})
             if m:
                 mlflow.log_metrics({k.replace("/", "_")[:250]: v for k, v in m.items()})
             mlflow.log_artifact(str(path), artifact_path="result")

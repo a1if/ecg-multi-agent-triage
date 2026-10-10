@@ -4,6 +4,9 @@ CNN-LSTM over one 1-s, 360-sample, z-scored beat window, with a small RR-interva
 timestep entering the context LSTM. The context LSTM's 32-d final hidden state is both the classifier input and
 the vector the adapter turns into virtual tokens.
 """
+import json
+from pathlib import Path
+
 import torch
 import torch.nn as nn
 
@@ -36,3 +39,10 @@ class CNNLSTMRR(nn.Module):
         _, (h_n, _) = self.context_lstm(torch.cat([seq, rr_emb], dim=2))
         context = h_n.squeeze(0)
         return self.head(context), context
+
+
+def deployed_adapter(models_dir: str | Path) -> tuple[Path, str]:
+    """The adapter deployment uses: the file and SHA-256 that ``manifest.json`` pins. Everything that loads or keys on
+    the adapter goes through here, so a promotion is a manifest change and nothing else."""
+    m = json.loads((Path(models_dir) / "manifest.json").read_text())["adapter"]
+    return Path(models_dir) / m["file"], m["sha256"]

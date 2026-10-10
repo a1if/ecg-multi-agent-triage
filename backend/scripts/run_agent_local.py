@@ -20,6 +20,7 @@ from ecg_agent.agent.planner import GemmaPlanner, RulePlanner
 from ecg_agent.agent.policy import Policy
 from ecg_agent.agent.questions import GemmaClassifier
 from ecg_agent.agent.reasoning_agent import ReasoningAgent
+from ecg_agent.core.models import deployed_adapter
 from ecg_agent.core.sender import Sender
 from ecg_agent.receiver.gemma import GemmaEngine
 from ecg_agent.receiver.local import LocalGemmaReceiver
@@ -39,7 +40,7 @@ def show(step: dict) -> None:
 
 async def main(args) -> None:
     t0 = time.perf_counter()
-    engine = GemmaEngine(ROOT / "artifacts/models/p1_item7_mea_r4_seed101.pt")
+    engine = GemmaEngine(deployed_adapter(ROOT / "artifacts/models")[0])
     print(f"Gemma ready in {time.perf_counter() - t0:.0f} s")
     receiver = LocalGemmaReceiver(engine)
     tracer, budget = Tracer(f"local-{args.record}"), Budget(max_reviews=args.budget)

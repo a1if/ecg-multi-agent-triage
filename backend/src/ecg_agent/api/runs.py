@@ -21,6 +21,7 @@ from ecg_agent.agent.policy import Policy
 from ecg_agent.agent.questions import GemmaClassifier, RuleClassifier
 from ecg_agent.agent.reasoning_agent import ReasoningAgent
 from ecg_agent.api.settings import Settings
+from ecg_agent.core.models import deployed_adapter
 from ecg_agent.core.rule import RANK
 from ecg_agent.core.sender import Sender
 from ecg_agent.observability import metrics
@@ -31,11 +32,12 @@ from ecg_agent.signal.stress import SCENARIOS
 def build_receiver(s: Settings):
     if s.receiver == "offline":
         return OfflineReceiver()
+    adapter = deployed_adapter(s.models_dir)[1]
     if s.receiver == "replay":
-        return ReplayReceiver(s.replay_store, live=None, record=False)
+        return ReplayReceiver(s.replay_store, live=None, record=False, adapter_sha256=adapter)
     if s.receiver == "http":
         live = HttpReceiver(s.inference_url, token=s.inference_token, auth=s.inference_auth)
-        return ReplayReceiver(s.replay_store, live=live, record=True)
+        return ReplayReceiver(s.replay_store, live=live, record=True, adapter_sha256=adapter)
     raise ValueError(f"unknown RECEIVER {s.receiver!r}")
 
 

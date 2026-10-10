@@ -24,7 +24,7 @@ What the script records:
 |---|---|
 | experiment `training` | One run per model file, holding its parameters, training or held-out metrics, SHA-256, the checkpoint file itself, and for the adapter the SHA-256 of the sender it was trained against |
 | registry `ecg-sender` | The perception agent's CNN-LSTM (v1, champion) |
-| registry `ecg-adapter` | The virtual-token adapter: seed 101 (v1, champion), seeds 202 and 303 (v2, v3, challengers) |
+| registry `ecg-adapter` | The virtual-token adapter: seed 303 (champion, promoted by the gate below), seeds 101 and 202 (challengers; 101 was deployed first) |
 | experiment `evaluation` | One run per result file in `backend/results/` (system evaluation, stress, real-Gemma, inference benchmarks, chaos), each tagged with the model versions and SHA-256s it tested |
 
 **How it ties to deployment.** The services don't load from MLflow. They load the files in
@@ -37,24 +37,40 @@ Why not serve straight from the registry? A demo with no paid infrastructure can
 up, and pinning by content hash means every image is reproducible on its own. In a team setting the next step would be
 a CI job that downloads `models:/ecg-adapter@champion`, checks its SHA-256 against the manifest and builds the image.
 
-### A finding: the champion is not the best validation score
+### Promoting a model: the gate
 
-| Adapter | Validation balanced accuracy |
+The first deployed adapter was seed 101. On the training run's validation split it scored lowest of the three seeds
+(0.72 balanced accuracy vs 0.80 and 0.82), but that split is about 30 windows per size, too small to decide on. The
+question for a promotion is whether a challenger is better **on patients it has never seen**, by more than noise, and
+not worse where it matters most.
+
+`backend/scripts/promotion_gate.py` answers it with rules fixed before any interval was computed:
+
+| Rule | Why |
 |---|---|
-| seed 101 (deployed) | 0.719 |
-| seed 202 | 0.799 |
-| seed 303 | 0.819 |
+| Held-out patients only (MIT-BIH DS2: 795 windows, 22 patients), every seed on the same windows | Paired: which windows were drawn cannot favour a seed |
+| Bootstrap over **patients**, not windows (10,000 resamples) | Windows from one patient are correlated; per-window resampling makes intervals look tighter than they are |
+| 97.5% intervals | Two challengers against one champion (Bonferroni) |
+| Promote only if balanced accuracy is better (interval above 0) **and** urgent recall is not worse by more than 0.05 **and** answers parse as often | A model can win on average while getting worse at the one class that matters most |
 
-The deployed adapter scores lowest on the validation split. It stays champion for now, and the reason is stored on the
-version as the `champion_reason` tag:
+Result (`backend/results/promotion_gate.json`):
 
-- The validation split is small (about 30 windows per size), so differences of this size are within noise.
-- Every downstream measurement uses seed 101: the paper's results, the inference benchmarks and the 257 recorded Gemma
-  answers behind the live demo.
+| Adapter | Balanced accuracy | Urgent recall | vs seed 101 |
+|---|---|---|---|
+| seed 101 (was deployed) | 0.800 | 0.731 | |
+| seed 202 | 0.821 | 0.648 | **fails**: gain within noise [−0.018, +0.058], and urgent recall −0.083 [−0.170, +0.007] |
+| seed 303 | 0.850 | 0.742 | **passes**: +0.050 [+0.020, +0.079], urgent recall +0.011 [−0.042, +0.082] |
 
-Promoting a challenger takes three steps. Evaluate it on the held-out test windows, not validation. If it wins there,
-re-record the demo's answers. Then move the `champion` alias and the manifest together. Changing a model in a clinical
-pipeline means re-checking everything measured with the old one, and this is that rule written down.
+Seed 202 is the instructive one: picked by average accuracy it would have looked like an upgrade, while missing about
+8 more urgent windows in every 100.
+
+**What the promotion changed, together, in one PR:** the adapter file and its SHA-256 in `manifest.json` (every loader
+reads the adapter from the manifest, so nothing else names a file); the demo's recorded answers, re-recorded with real
+Gemma through the new adapter (282 answers; `record_demo_answers.py --verify` then found 0 misses both in the API
+image and in a fresh install like Streamlit Community Cloud's); the real-Gemma system evaluation and the inference benchmark, re-run (same safety and quality results; see
+[benchmarks.md](benchmarks.md)); the registry's
+`champion` alias. Recorded answers on the adapter channel are keyed by the adapter's SHA-256, so an old recording can
+never be served for a new adapter. CI runs `promotion_gate.py --check`: the deployed adapter must be the gate's choice.
 
 ## 2. Quality and drift alerts (Prometheus)
 

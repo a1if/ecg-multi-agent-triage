@@ -5,7 +5,7 @@
 Setup: RTX 5070 12 GB (Windows 11), Gemma 4 E4B, bitsandbytes NF4, Hugging Face Transformers `generate`, batch size
 1, schema-constrained greedy decoding, no prefix cache. 15 windows from the bundled MIT-BIH test records (5 per size:
 2 urgent, 2 priority, 1 routine by the rule) × 3 channels = 45 calls. Script: `backend/scripts/bench_inference.py`;
-raw data: `backend/results/bench_baseline_5070.json`. Medians per cell (5 calls each).
+raw data: `backend/results/bench_baseline_5070_seed101.json`. Medians per cell (5 calls each).
 
 **Cold start:** imports 7.9 s; model load + token table + warm-up 59.4 s; 9.1 GB GPU memory after load.
 
@@ -44,7 +44,7 @@ raw data: `backend/results/bench_baseline_5070.json`. Medians per cell (5 calls 
 
 Same machine, model, windows and channels as the baseline. The agent's reviews now stop at the tier (7 answer tokens:
 the forced `{"urgency_tier":"` literal plus the tier word); the justification is generated only on request, with
-those 7 tokens placed in the prompt. Raw data: `backend/results/bench_decide_explain_5070.json`.
+those 7 tokens placed in the prompt. Raw data: `backend/results/bench_decide_explain_5070_seed101.json`.
 
 | Channel | Decide (new review cost) | Baseline full answer | Speed-up | Energy per review: new vs baseline | Explain (on demand) |
 |---|---|---|---|---|---|
@@ -121,7 +121,7 @@ hold; I5 the overall tier is at least the highest readable screening tier; I6 th
 |---|---|---|
 | Invariants under injected faults (CPU) | 7 records × 10 min × 3 modes × fault rate 0 / 0.3 / 1.0 (one-tier under-triage, plus 5% unparseable when faults are on) = 63 runs | **0 violations.** 343 faults injected, **343 rejected** and resent; at fault rate 1.0, 99 windows ended at their screening tier, flagged for human review. ~0.65 s per run |
 | Signal faults (CPU) | 7 records × 10 scenarios = 70 runs | **70/70 expected outcomes**, 0 invariant violations. The noise thresholds were set on records 100 and 233 only; the other five records are held-out validation |
-| Real Gemma (RTX 5070) | 7 records × 5 min, balanced mode, 6 reviews each; every finding explained; 12-question battery on record 233 | **0 violations.** 7/7 summaries grounded; 39/42 explanations by Gemma, 3 by the rule (filtered text disagreed); **12/12 questions answered as expected, 6/6 hostile ones refused**; median run 20.2 s incl. summary; model load 58 s |
+| Real Gemma (RTX 5070, adapter seed 101) | 7 records × 5 min, balanced mode, 6 reviews each; every finding explained; 12-question battery on record 233 | **0 violations.** 7/7 summaries grounded; 39/42 explanations by Gemma, 3 by the rule (filtered text disagreed); **12/12 questions answered as expected, 6/6 hostile ones refused**; median run 20.2 s incl. summary; model load 58 s |
 | Load (API, offline receiver) | 8 runs of 10 min posted at once, concurrency limit 2 | 8/8 complete, never more than 2 running, 5.9 s total |
 | Chaos (API + GPU service, two processes) | GPU service killed 3.8 s into a live 10-min run (after 2 windows) | Run **completed**: 2 answers from `gemma` before the kill, 8 from the labelled `offline-rule` after, summary from the template; none below screening |
 
@@ -129,6 +129,17 @@ Receiver verdicts in the Gemma suite (46 calls): adapter 18/18 agreed with scree
 (2 under-triage), compact 0/2 (both under-triage; it is only used as the second escalation step). Every under-triage
 was caught and resent. These counts are too small to rank channels and come from different windows (the router sends
 abnormal-heavy windows to the adapter), so they do not contradict the paper's accuracy ordering.
+
+**After promoting adapter seed 303** ([mlops.md](mlops.md#promoting-a-model-the-gate)), the real-Gemma suite was
+re-run (`eval_gemma.json`; the seed 101 run is kept as `eval_gemma_seed101.json`). Same outcome on every safety and
+quality measure: 0 violations, adapter 18/18 agreeing with screening, filtered 24/26, 39/42 explanations by Gemma,
+7/7 summaries grounded, 12/12 questions as expected. The latency benchmarks were re-run too
+(`bench_*_5070_wsl_seed303.json`), but on the same GPU inside the Linux container rather than natively on Windows
+(native loading crashed that day in transformers' memory-mapped loader). The container is slower overall: the text
+channels, which never touch the adapter, were 27-32% slower there as well, so the tables above (native, seed 101) stay
+the latency reference. Like for like, nothing moved: the adapter's time to the tier decision relative to filtered text
+is 0.98 (was 0.97), decide-early still gave the full answer's tier on 45/45 calls, and the adapter's tier matched the
+rule on 14/15 benchmark windows (was 11/15).
 
 Observed weakness: the question "Is there a run of abnormal beats near the start?" was routed to `evidence` in an
 earlier run and to `unclear` here (safe, but less useful). The classifier is sensitive to the window list in its

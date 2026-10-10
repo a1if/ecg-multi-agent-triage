@@ -58,6 +58,8 @@ jobs:
           pip install -e ".[api,dev]"
       - name: Tests (agents, policy, questions, signal quality, services)
         run: pytest -q --junitxml=test-results.xml
+      - name: Promotion gate (the deployed adapter must be the one held-out evidence selects)
+        run: python scripts/promotion_gate.py --check
       - uses: actions/upload-artifact@v6
         if: always()
         with: { name: backend-test-results, path: backend/test-results.xml }

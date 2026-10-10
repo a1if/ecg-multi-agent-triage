@@ -27,6 +27,7 @@ import json
 import os
 import platform
 import statistics
+import sys
 import time
 from pathlib import Path
 
@@ -35,6 +36,7 @@ T_PROCESS = time.perf_counter()
 import numpy as np  # noqa: E402
 import torch  # noqa: E402
 
+from ecg_agent.core.models import deployed_adapter  # noqa: E402
 from ecg_agent.core.rule import window_tier  # noqa: E402
 from ecg_agent.core.sender import Sender, file_sha256  # noqa: E402
 from ecg_agent.receiver.base import TriageRequest  # noqa: E402
@@ -46,7 +48,7 @@ SIZES = (10, 20, 50)
 CHANNELS = ("compact", "filtered", "adapter")
 WANT = {"urgent": 2, "priority": 2, "routine": 1}
 SENDER_CK = ROOT / "artifacts/models/cnn_lstm_rr_seed0.pt"
-ADAPTER_CK = ROOT / "artifacts/models/p1_item7_mea_r4_seed101.pt"
+ADAPTER_CK = deployed_adapter(ROOT / "artifacts/models")[0]
 
 
 def save_atomic(path: Path, obj) -> None:
@@ -164,6 +166,8 @@ def main() -> None:
     out = args.out or ROOT / "results" / f"bench_baseline_{gpu.split()[-1].lower()}.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     state = json.loads(out.read_text(encoding="utf-8")) if out.exists() else None
+    if state and not args.summary and state.get("adapter_sha256") != file_sha256(ADAPTER_CK):
+        sys.exit(f"{out.name} was measured with another adapter; move it aside to benchmark the deployed one")
     if args.summary:
         print_table(state["summary"], state["cold_start"])
         return

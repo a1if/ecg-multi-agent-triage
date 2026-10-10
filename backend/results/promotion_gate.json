@@ -1,0 +1,70 @@
+{
+ "rules": "(fixed before any confidence interval was computed):\n  set          the stratified set (balanced across tiers: the designed test); the natural set is reported, not gated\n  uncertainty  paired bootstrap over patients (records), not windows: windows from one patient are correlated, and\n               treating them as independent would make the intervals look tighter than they are. 10,000 resamples.\n  multiplicity two challengers are compared with the champion, so each interval is 97.5% (Bonferroni, 0.05 / 2)\n  promote if   1. balanced accuracy: the lower bound of (challenger - champion) is above 0\n               2. urgent recall: the lower bound of (challenger - champion) is above -0.05 (non-inferiority: a\n                  challenger may not be meaningfully worse at recognising urgent windows, whatever else it gains)\n               3. parse rate: not lower than the champion's\n  if several pass, the highest balanced accuracy wins",
+ "n_windows": 795,
+ "n_patients": 22,
+ "champion": "seed101",
+ "interval": "97.5%",
+ "seeds": {
+  "seed101": {
+   "balanced_accuracy": 0.7996,
+   "urgent_recall": 0.7311,
+   "parse_rate": 1.0
+  },
+  "seed202": {
+   "balanced_accuracy": 0.8212,
+   "urgent_recall": 0.6477,
+   "parse_rate": 1.0
+  },
+  "seed303": {
+   "balanced_accuracy": 0.8497,
+   "urgent_recall": 0.7424,
+   "parse_rate": 1.0
+  }
+ },
+ "comparisons": {
+  "seed202": {
+   "balanced_accuracy_diff": 0.0217,
+   "balanced_accuracy_ci": [
+    -0.0183,
+    0.0582
+   ],
+   "urgent_recall_diff": -0.0833,
+   "urgent_recall_ci": [
+    -0.1695,
+    0.007
+   ],
+   "checks": {
+    "balanced_accuracy_better": false,
+    "urgent_recall_not_worse": false,
+    "parse_rate_not_lower": true
+   },
+   "passes": false
+  },
+  "seed303": {
+   "balanced_accuracy_diff": 0.0502,
+   "balanced_accuracy_ci": [
+    0.0203,
+    0.0787
+   ],
+   "urgent_recall_diff": 0.0114,
+   "urgent_recall_ci": [
+    -0.0421,
+    0.0821
+   ],
+   "checks": {
+    "balanced_accuracy_better": true,
+    "urgent_recall_not_worse": true,
+    "parse_rate_not_lower": true
+   },
+   "passes": true
+  }
+ },
+ "decision": "promote seed303",
+ "selected": "seed303",
+ "selected_sha256": "b1204b79e619c920404d4ad9226ed5042eb61a91a1b831a6519798a2b6e805ed",
+ "natural_set": {
+  "seed101": 0.7961,
+  "seed202": 0.8939,
+  "seed303": 0.8854
+ }
+}
