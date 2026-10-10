@@ -1,0 +1,91 @@
+# Model- and data-quality alerts (Prometheus rules). Thresholds come from measured baselines (docs/benchmarks.md);
+# each rule needs a minimum volume so a handful of events cannot fire it. Tested by ops/alerts_test.yml (promtool).
+groups:
+  - name: model-quality
+    rules:
+      - alert: LLMUnderTriageRateHigh
+        # Baseline: real Gemma, all bundled records: 4 of 46 answers below the screening tier (8.7%). The guardrail
+        # catches every one, but a sustained rise means the receiver is degrading (a model or library change, or a
+        # shift in inputs) and costs re-sends and GPU time.
+        expr: |
+          sum(increase(agent_guardrail_total{verdict="under_triage"}[1h]))
+            / sum(increase(agent_guardrail_total[1h])) > 0.20
+          and sum(increase(agent_guardrail_total[1h])) >= 20
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "Receiver answers below the screening tier: {{ $value | humanizePercentage }} in the last hour (baseline ~9%)"
+          runbook: "Compare by channel (Grafana: guardrail verdicts). Check for a model, adapter or library change (manifest SHA-256, image tag) and for input drift."
+
+      - alert: LLMUnparsedAnswersHigh
+        # Baseline 0 of 46: constrained decoding makes every answer parse. Any sustained rate means decoding broke.
+        expr: |
+          sum(increase(agent_guardrail_total{verdict="unparsed"}[1h]))
+            / sum(increase(agent_guardrail_total[1h])) > 0.05
+          and sum(increase(agent_guardrail_total[1h])) >= 20
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $value | humanizePercentage }} of receiver answers did not parse (baseline 0)"
+          runbook: "Constrained decoding or the tokenizer changed: check the inference image and transformers version."
+
+      - alert: ReceiverFallingBackToRule
+        # Only where the GPU service is meant to answer (RECEIVER=http): most answers coming from the rule means the
+        # GPU service is down or timing out. Replay/offline deployments use the rule by design and never fire this.
+        expr: |
+          (
+            sum(increase(receiver_latency_seconds_count{source="offline-rule"}[15m]))
+              / sum(increase(receiver_latency_seconds_count[15m])) > 0.5
+            and sum(increase(receiver_latency_seconds_count[15m])) >= 5
+          )
+          and on() (max(agent_receiver_mode{mode="http"}) == 1)
+        for: 5m
+        labels: { severity: critical }
+        annotations:
+          summary: "{{ $value | humanizePercentage }} of answers from the rule: the GPU service is not answering"
+          runbook: "Check the inference service (readiness, cold start, GPU quota). Answers stay safe (labelled rule) but lose explanations."
+
+      - alert: RunsFailing
+        expr: sum(increase(agent_runs_total{status="failed"}[15m])) > 0
+        labels: { severity: critical }
+        annotations:
+          summary: "{{ $value }} run(s) failed in the last 15 minutes"
+          runbook: "A failed run is reported as failed, never as a tier; read its trace (run status error) and the API logs."
+
+  - name: data-drift
+    rules:
+      - alert: UnreadableRecordingsSpike
+        # Baseline: 0 of 7 clean bundled records unreadable. A rise means the inputs changed (devices, electrodes,
+        # an upstream format change), not that patients changed.
+        expr: |
+          sum(increase(agent_runs_total{status="unreadable"}[1h]))
+            / sum(increase(agent_runs_total[1h])) > 0.2
+          and sum(increase(agent_runs_total[1h])) >= 5
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $value | humanizePercentage }} of recordings unreadable in the last hour (baseline 0)"
+          runbook: "Look at the unreadable runs' reasons (noise, flat, clipping). An input-pipeline problem, not a model one."
+
+      - alert: InputNoiseDrift
+        # Median noise per recording: clean records 0.0004-0.016; 0.03 is where the warning starts and classifier
+        # accuracy begins to fall (docs/benchmarks.md, Signal quality). Sustained over 6 h: drift, not one bad patch.
+        expr: |
+          histogram_quantile(0.5, sum by (le) (rate(perception_input_noise_bucket[6h]))) > 0.03
+          and sum(increase(perception_input_noise_count[6h])) >= 10
+        for: 30m
+        labels: { severity: warning }
+        annotations:
+          summary: "Median input noise {{ $value }} over 6 h (clean baseline < 0.02)"
+          runbook: "Classifier sensitivity drops with noise before anything is marked unreadable: check recording hardware/settings."
+
+      - alert: UnreadableWindowShareHigh
+        expr: |
+          sum(increase(perception_windows_total{readable="false"}[6h]))
+            / sum(increase(perception_windows_total[6h])) > 0.10
+          and sum(increase(perception_windows_total[6h])) >= 100
+        for: 30m
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $value | humanizePercentage }} of windows too noisy to classify over 6 h"
+          runbook: "Partial noise (loose electrodes, movement) is growing: those windows go to manual review."
