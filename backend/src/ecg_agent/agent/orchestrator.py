@@ -171,8 +171,11 @@ class Orchestrator:
         if tier not in ("routine", "priority", "urgent") or not clinician.strip() or not reason.strip():
             raise ValueError("an override needs a valid tier, the clinician's name and a reason")
         f = self.r.findings[wid]
+        current = f["override"]["to_tier"] if f.get("override") else f["final_tier"]  # a second override chains
+        if tier == current:
+            raise ValueError(f"{wid} is already {tier}: an override must change the tier")
         entry = {"t": round(time.time(), 3), "verdict": "clinician_override", "window_id": wid,
-                 "from_tier": f["final_tier"], "to_tier": tier, "clinician": clinician, "reason": reason}
+                 "from_tier": current, "to_tier": tier, "clinician": clinician, "reason": reason}
         f["override"] = entry
         self.overrides.append(entry)
         self.audit.append(entry)
