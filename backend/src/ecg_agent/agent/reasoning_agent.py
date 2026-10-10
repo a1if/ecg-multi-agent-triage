@@ -53,6 +53,11 @@ SYSTEM_ANSWER = (
     "its answer fall below the rule's tier, and a clinician signs off. Research prototype, not clinical advice.")
 
 
+# How a clinician should read each answer source (the internal names stay in the data and the audit trail).
+SOURCE_WORDS = {"gemma": "Gemma", "replay": "Gemma (recorded answer)", "offline-rule": "the triage rule (no LLM)",
+                "rule": "the triage rule", "mock": "a simulated receiver"}
+
+
 class RState(TypedDict, total=False):
     queue: list  # window messages still to triage this turn
     xqueue: list  # window messages sent for an explanation
@@ -453,8 +458,10 @@ class ReasoningAgent:
         f = self.findings[wid]
         e = f["explanation"]
         note = f" ({e['note']})" if e.get("note") else ""
+        source, _, channel = e["explained_by"].partition(" over ")
+        who = SOURCE_WORDS.get(source, source) + (f", over {channel} text" if channel else "")
         text = (f"{wid} is {f['final_tier']} ({f['resolution'].replace('_', ' ')}). {e['justification']} "
-                f"Guideline: {e['guideline_fact']} Explained by {e['explained_by']}{note}.")
+                f"Guideline: {e['guideline_fact']} Explained by {who}{note}.")
         self._answer("explain", text, wid, self._cite(wid), data={"explanation": e})
 
     def _answer_evidence(self, wid: str) -> None:
