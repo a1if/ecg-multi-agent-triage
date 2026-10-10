@@ -83,10 +83,11 @@ the latent channel between a non-transformer sender and a frozen LLM, its cost a
 | **Testing** | 79 tests (agents, policy, questions, signal quality, services, UI); a system evaluation with fault injection that fails CI on any broken invariant; load and chaos tests |
 | **Containers** | Multi-stage Docker images, non-root, health checks; docker-compose with a GPU profile and Prometheus + Grafana dashboards |
 | **CI/CD** | GitHub Actions: lint, tests, safety evaluation, image build + smoke test + Trivy scan, images published per commit; branch protection; grouped Dependabot updates |
+| **MLOps** | MLflow model registry with lineage (each evaluation linked to the model versions it tested; deployed = registry champion, checked by hash); Prometheus alert rules for model quality and input drift, thresholds from measured baselines, unit-tested with promtool in CI ([docs/mlops.md](docs/mlops.md)) |
 | **Cloud** | Terraform for Google Cloud Run (public frontend → private API → optional L4 GPU, keyless GitHub deploys via Workload Identity Federation); the live demo runs free on Streamlit Community Cloud |
 
 **Stack:** Python · PyTorch · Hugging Face Transformers · bitsandbytes · LangGraph · FastAPI · Pydantic · Streamlit ·
-Plotly · Docker · Prometheus · Grafana · GitHub Actions · Terraform · Google Cloud Run · pytest · ruff · Trivy
+Plotly · Docker · MLflow · Prometheus · Grafana · GitHub Actions · Terraform · Google Cloud Run · pytest · ruff · Trivy
 
 ## Run it
 
@@ -132,8 +133,8 @@ backend/src/ecg_agent/   agents (agent/), sender and adapter (core/), signal pip
 backend/tests/           79 tests;  backend/scripts/  evaluation, benchmarks, chaos, recording, launcher
 frontend/                Streamlit app (a thin client of the API)
 infra/terraform/         Google Cloud infrastructure;  deploy/  Hugging Face Space variant
-ops/                     Prometheus and Grafana configuration
-docs/                    design, benchmarks, testing, deployment
+ops/                     Prometheus (alert rules + tests) and Grafana configuration
+docs/                    design, benchmarks, testing, deployment, MLOps
 ```
 
 ## Licence and data
