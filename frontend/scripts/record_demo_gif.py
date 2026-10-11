@@ -61,6 +61,7 @@ def scroll_to(page: Page, text: str) -> None:
     page.get_by_text(text).first.evaluate("e => e.scrollIntoView({block: 'start'})")
     page.mouse.move(VIEW["width"] // 2, VIEW["height"] // 2)
     page.mouse.wheel(0, -60)  # keep a little context above the target
+    page.mouse.move(8, VIEW["height"] - 8)  # park the pointer on the sidebar: no chart tooltips in the frame
 
 
 def main() -> None:
@@ -102,11 +103,21 @@ def main() -> None:
         reel.snap("4  Every message between the agents went through the orchestrator's checks", 3000)
         page.get_by_text("The agents' conversation").click()
 
-        # 4. Questions: one answered with a citation, one refused before any LLM sees it.
+        # 4. What the learned adapter buys: the same decisions over virtual tokens and over text, measured.
+        page.get_by_role("tab", name="⚖️ Adapter vs text").click()
+        measure = page.get_by_role("button", name="Measure both channels")
+        if measure.count():
+            measure.click()
+        page.get_by_text("Prompt tokens Gemma read").wait_for(timeout=TIMEOUT)
+        scroll_to(page, "decided twice")
+        reel.snap("5  Each decision measured both ways: learned adapter vs text (tokens, time, GPU energy)", 4500,
+                  settle=2500)
+
+        # 5. Questions: one answered with a citation, one refused before any LLM sees it.
         page.get_by_role("tab", name="🩺 Ask").click()
         chat = page.get_by_placeholder("Ask a question about this recording")
-        for q, caption in (("Why is w000 urgent?", "5  Ask why: answered by Gemma, citing the agents' messages"),
-                           ("Should she take amiodarone?", "6  Medical advice is refused before any LLM sees it")):
+        for q, caption in (("Why is w000 urgent?", "6  Ask why: answered by Gemma, citing the agents' messages"),
+                           ("Should she take amiodarone?", "7  Medical advice is refused before any LLM sees it")):
             chat.fill(q)
             chat.press("Enter")
             page.get_by_text(q).last.wait_for(timeout=TIMEOUT)
@@ -114,23 +125,23 @@ def main() -> None:
             chat.scroll_into_view_if_needed()
             reel.snap(caption, 3000)
 
-        # 5. The clinician overrides a tier: a recorded human decision, never something the agents can do.
+        # 6. The clinician overrides a tier: a recorded human decision, never something the agents can do.
         page.get_by_role("tab", name="🔎 Findings").click()
         page.get_by_text("Each row is one window").wait_for(timeout=TIMEOUT)
         scroll_to(page, "Clinician override")
         page.get_by_label("Your name").fill("Dr Demo")
         page.get_by_label("Reason").fill("artefact on review of the strip")
-        reel.snap("7  The clinician can change a tier, with their name and a reason", 2400)
+        reel.snap("8  The clinician can change a tier, with their name and a reason", 2400)
         page.get_by_role("button", name="Override").click()
         page.get_by_text("recorded in the audit trail").wait_for(timeout=TIMEOUT)
         scroll_to(page, "Clinician override")
-        reel.snap("7  The clinician can change a tier, with their name and a reason", 2000, settle=300)
+        reel.snap("8  The clinician can change a tier, with their name and a reason", 2000, settle=300)
 
-        # 6. The audit trail ends with that decision.
+        # 7. The audit trail ends with that decision.
         page.get_by_role("tab", name="🧾 Audit trail").click()
         page.get_by_text("Clinician decisions").wait_for(timeout=TIMEOUT)
         scroll_to(page, "Clinician decisions")
-        reel.snap("8  The audit trail records every check and every human decision", 3500)
+        reel.snap("9  The audit trail records every check and every human decision", 3500)
 
         browser.close()
     reel.save(a.out)
