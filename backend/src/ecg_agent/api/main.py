@@ -37,6 +37,7 @@ from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from pydantic import BaseModel, Field
 from sse_starlette.sse import EventSourceResponse
 
+from ecg_agent.agent.questions import suggested_questions
 from ecg_agent.api.plotting import signal_view
 from ecg_agent.api.runs import RunManager
 from ecg_agent.api.settings import Settings
@@ -205,6 +206,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                              w.public() for w in o.p.windows.values()],
                          "answers": o.r.answered, "overrides": o.overrides, "steps": len(run.tracer.steps),
                          "comparisons": {w: o.r.comparison(w) for w in o.r.findings},
+                         "suggestions": suggested_questions(o.r.findings, [w.public() for w in o.p.windows.values()])
+                         if o.status == "complete" else [],
                          "attempts": [{"strategy": a.strategy["why"], **a.quality} for a in o.p.attempts]})
 
     @app.get("/v1/runs/{run_id}/events")

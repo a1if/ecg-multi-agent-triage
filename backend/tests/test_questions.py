@@ -138,3 +138,17 @@ def test_find_refs(text, ids):
 def test_safety_screen_lets_ordinary_questions_through():
     for q in ("Why is w002 urgent?", "Show me the beats at 1:32", "Did the adapter disagree with filtered text?"):
         assert safety_screen(q) is None
+
+
+def test_suggested_questions_are_stable_and_end_with_the_review():
+    from ecg_agent.agent.questions import suggested_questions
+
+    findings = {"w001": {"final_tier": "priority"}, "w003": {"final_tier": "urgent"}}
+    windows = [{"id": "w000", "readable": False}, {"id": "w001"}, {"id": "w002"}, {"id": "w003"}]
+    qs = suggested_questions(findings, windows)
+    assert qs[0] == "Why is w003 urgent?" and qs[-1] == "Can you look at w002?"  # most urgent first, review last
+    assert "Should she take amiodarone?" in qs  # a refusal is part of the demo
+    # Asking "Can you look at w002?" adds a finding; the list must not move (the recording depends on the wording).
+    findings["w002"] = {"final_tier": "routine", "origin": "question"}
+    assert suggested_questions(findings, windows) == qs
+    assert suggested_questions({}, windows) == []

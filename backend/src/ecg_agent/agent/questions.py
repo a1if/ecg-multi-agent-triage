@@ -161,3 +161,23 @@ class GemmaClassifier:
         if t in ("explain", "review", "evidence") and not wid:
             t = "unclear"
         return Intent(t, wid, source="gemma")
+
+
+# ----- suggested questions: the demo's recorded set, one wording shared by the app and the recording script -----
+SUGGESTED = ("Why is {top} {tier}?", "Show me the beats in {top}", "Is there a run of abnormal beats near the start?",
+             "Did the channels disagree anywhere?", "How does this system work?", "Should she take amiodarone?",
+             "Can you look at {unreviewed}?")
+_RANK = {"routine": 0, "priority": 1, "urgent": 2}
+
+
+def suggested_questions(findings: dict, windows: list[dict]) -> list[str]:
+    """Questions worth trying on a finished run. Built from the run's own review only (windows reviewed because a
+    question asked for them do not count), so the list is the same before and after they are asked; the window review
+    comes last because it changes what the classifier is shown for any later question."""
+    own = {w: f for w, f in findings.items() if f.get("origin") != "question"}
+    if not own:
+        return []
+    top = sorted(own, key=lambda w: (-_RANK[own[w]["final_tier"]], w))[0]
+    unrev = next((w["id"] for w in windows if w["id"] not in own and w.get("readable", True)), None)
+    return [q.format(top=top, tier=own[top]["final_tier"], unreviewed=unrev)
+            for q in SUGGESTED if unrev or "{unreviewed}" not in q]

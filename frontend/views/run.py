@@ -313,7 +313,17 @@ with tab_ask:
             if a.get("data", {}).get("refusal"):
                 meta.append(f"refused by {a['data'].get('layer', 'safety patterns')}")
             st.caption(" · ".join(meta))
-    q = st.chat_input("Ask a question about this recording")
+    # Suggested questions, in the order the demo recorded them: clicking one always gets the recorded Gemma answer.
+    asked = {a["question"] for a in d.get("answers", [])}
+    offered = [q for q in d.get("suggestions", []) if q not in asked]
+    picked = None
+    if offered:
+        st.caption("Try one of these, or ask your own:")
+        cols = st.columns(2)
+        for i, sq in enumerate(offered):
+            if cols[i % 2].button(sq, key=f"suggest_{i}", use_container_width=True):
+                picked = sq
+    q = st.chat_input("Ask a question about this recording") or picked
     if q:
         with st.spinner("The reasoning agent is working (it may consult the perception agent)..."):
             try:

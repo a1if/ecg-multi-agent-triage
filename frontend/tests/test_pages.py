@@ -132,3 +132,23 @@ def test_adapter_tab_fills_in_by_itself_only_with_recorded_answers(monkeypatch, 
     has_button = any(b.label.startswith("Measure both channels") for b in at.button)
     assert has_button != auto
     assert any(m.label.startswith("Prompt tokens") for m in at.metric) == auto
+
+
+def test_suggested_question_buttons_ask_exactly_that_question(monkeypatch):
+    monkeypatch.syspath_prepend(str(FRONTEND))
+    fake, doc, asked = fake_api("complete"), run_doc("complete"), []
+    doc["suggestions"] = ["Why is w000 urgent?", "How does this system work?"]
+    doc["answers"] = [{"question": "Why is w000 urgent?", "text": "Because.", "type": "explain", "citations": [],
+                       "data": {}}]
+    fake.run = lambda rid: doc
+    fake.ask = lambda rid, q: asked.append(q) or {}
+    monkeypatch.setitem(sys.modules, "api", fake)
+    at = AppTest.from_file(str(FRONTEND / "views/run.py"), default_timeout=20)
+    at.session_state["status"] = STATUS
+    at.session_state["run_id"] = "r1"
+    at.run()
+    labels = [b.label for b in at.button]
+    assert "How does this system work?" in labels and "Why is w000 urgent?" not in labels  # already asked: hidden
+    next(b for b in at.button if b.label == "How does this system work?").click().run()
+    assert not at.exception, at.exception
+    assert asked == ["How does this system work?"]  # the recorded wording, verbatim

@@ -13,7 +13,11 @@ recorded answers are matched by exact numbers. Measured in a fresh Python 3.12 i
 and the GPU service (`docker compose --profile gpu up`), run `backend/scripts/record_demo_answers.py`, copy the store
 out of the container, then restart the API with `RECEIVER=replay` and run `record_demo_answers.py --verify`. The
 replay store counts every request it could not answer (`replay_misses` in `/v1/status`), and `--verify` fails unless
-all presets, explanations, questions and summaries come from the recording. Adapter-channel answers are keyed by the
+all presets, explanations, questions and summaries come from the recording. It runs every combination the demo
+offers (7 records x every stress scenario x 3 modes = 210) and also checks each one demonstrates fully: a sensible
+status, every finding explained, both channels measured in the Adapter vs text tab, and every suggested question
+answered. The Ask tab's suggested questions use the recorded wording, so they always get the recorded Gemma answers;
+a visitor's own wording falls back to keyword routing, labelled. Adapter-channel answers are keyed by the
 adapter's SHA-256, so a promoted adapter can never be served the previous adapter's answers.
 
 1. Sign in at https://share.streamlit.io with GitHub.
