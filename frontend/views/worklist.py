@@ -19,7 +19,12 @@ def open_run(run_id: str) -> None:
 
 
 # ----- new run -----
-with st.expander("➕ Analyse a recording", expanded=not st.session_state.get("has_runs", False)):
+# A refused start (e.g. the public demo's rate limit) is shown above the form, which stays open: inside a panel
+# that collapses on the next redraw, the reason would be hidden and Start would look broken.
+start_error = st.session_state.pop("start_error", None)
+if start_error:
+    st.error(f"Could not start: {start_error}", icon="⏳")
+with st.expander("➕ Analyse a recording", expanded=not st.session_state.get("has_runs", False) or bool(start_error)):
     try:
         recs, scen = api.records(), api.scenarios()
     except api.ApiError as e:
@@ -52,7 +57,8 @@ with st.expander("➕ Analyse a recording", expanded=not st.session_state.get("h
         try:
             r = api.create_run(rec, start, dur, mode, None if scenario == "none" else scenario, reviews)
         except api.ApiError as e:
-            st.error(e.detail)
+            st.session_state["start_error"] = e.detail
+            st.rerun()
         else:
             open_run(r["id"])
 
@@ -64,7 +70,8 @@ with st.expander("➕ Analyse a recording", expanded=not st.session_state.get("h
                 try:
                     open_run(api.upload_run(f.name, f.getvalue(), fs, "balanced")["id"])
                 except api.ApiError as e:
-                    st.error(e.detail)
+                    st.session_state["start_error"] = e.detail
+                    st.rerun()
     else:
         st.caption("Uploads are off in this deployment (public demo). Run it locally with `--uploads` to analyse "
                    "your own files.")

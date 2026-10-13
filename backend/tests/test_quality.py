@@ -90,6 +90,13 @@ REAL = ("The overall triage tier is urgent. The ECG contained 417 beats over a 3
     (REAL + " Window w002 was routine.", FACTS, "tiers not in the facts"),
     (REAL, dict(FACTS, windows_needing_human_review=["w004"]), "says no window needs review"),
     (REAL.replace(" Research prototype, not clinical advice.", ""), FACTS, "missing disclaimer"),
+    # A number Gemma repeats from a quality warning is grounded (found when the dropout scenarios were recorded) ...
+    (REAL.replace("There were", "33% of the recording was flat. There were"),
+     dict(FACTS, quality_warnings=["33% of the recording is flat (no signal); those stretches were not assessed"]), None),
+    # ... but one it makes up next to the warning is not.
+    (REAL.replace("There were", "40% of the recording was flat. There were"),
+     dict(FACTS, quality_warnings=["33% of the recording is flat (no signal); those stretches were not assessed"]),
+     "numbers not in the facts"),
 ])
 def test_narrative_grounding(text, facts, problem):
     found = check_narrative(text, facts)

@@ -159,3 +159,14 @@ def test_channel_comparison_measures_both_and_changes_nothing(done):
     audit = c.get(f"/v1/runs/{d['id']}/audit").json()
     assert any((r.get("content") or {}).get("purpose") == "compare" for r in audit)  # through the orchestrator
     assert c.post(f"/v1/runs/{d['id']}/windows/{wid}/compare").json() == cmp  # measured once, then reused
+
+
+def test_unreadable_run_shows_its_signal_and_says_who_wrote_the_summary():
+    with client() as c:
+        rid = c.post("/v1/runs", json={"record": "200", "duration_s": 60, "scenario": "noise_-6db"}).json()["id"]
+        d = wait(c, rid)
+        assert d["status"] == "unreadable"
+        assert d["report"]["narrative_source"] == "quality-check"  # no LLM wrote it, and it says so
+        sig = c.get(f"/v1/runs/{rid}/signal", params={"start_s": 0, "end_s": 60}).json()
+        assert sig["unreadable"] and len(sig["t"]) > 100  # the noise is visible: it is why nothing was triaged
+        assert sig["beats"] == []  # no beat labels from a signal too noisy to classify

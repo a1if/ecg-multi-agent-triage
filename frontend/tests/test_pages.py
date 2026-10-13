@@ -96,6 +96,7 @@ def test_recording_page(page, status):
     assert not at.exception, at.exception
     if status == "unreadable":
         assert any("Not triaged" in e.value for e in at.error)  # says so, never shows a tier
+        assert next(m for m in at.metric if m.label == "Need a person").value == "whole recording"
     else:
         assert [m.value for m in at.metric][0].endswith("urgent")
         assert any("noise level" in w.value for w in at.warning)
@@ -152,3 +153,64 @@ def test_suggested_question_buttons_ask_exactly_that_question(monkeypatch):
     next(b for b in at.button if b.label == "How does this system work?").click().run()
     assert not at.exception, at.exception
     assert asked == ["How does this system work?"]  # the recorded wording, verbatim
+
+
+def test_the_window_review_suggestion_comes_last(monkeypatch):
+    monkeypatch.syspath_prepend(str(FRONTEND))
+    fake, doc = fake_api("complete"), run_doc("complete")
+    doc["suggestions"] = ["How does this system work?", "Can you look at w003?"]
+    fake.run = lambda rid: doc
+    monkeypatch.setitem(sys.modules, "api", fake)
+    at = AppTest.from_file(str(FRONTEND / "views/run.py"), default_timeout=20)
+    at.session_state["status"], at.session_state["run_id"] = STATUS, "r1"
+    at.run()
+    labels = [b.label for b in at.button]
+    assert "How does this system work?" in labels and "Can you look at w003?" not in labels  # not yet
+    doc["answers"] = [{"question": "How does this system work?", "text": "x", "type": "system", "citations": [],
+                       "data": {}}]
+    at.run()
+    assert "Can you look at w003?" in [b.label for b in at.button]  # now it is the only one left
+
+
+def test_a_refused_start_says_why_above_the_form(monkeypatch):
+    """The public demo's rate limit refuses a start; the reason must be visible, not hidden in a collapsed panel."""
+    monkeypatch.syspath_prepend(str(FRONTEND))
+    fake = fake_api("complete")
+
+    def refuse(*a, **k):
+        raise fake.ApiError(429, "too many run requests; try again in a minute")
+
+    fake.create_run = refuse
+    monkeypatch.setitem(sys.modules, "api", fake)
+    at = AppTest.from_file(str(FRONTEND / "views/worklist.py"), default_timeout=20)
+    at.session_state["status"], at.session_state["has_runs"] = STATUS, True  # runs exist: the panel starts closed
+    at.run()
+    at.button[0].click().run()  # Start (the form's submit button)
+    assert not at.exception, at.exception
+    assert any("try again in a minute" in e.value for e in at.error)
+    assert at.expander[0].proto.expanded  # the form stays open for the next try
+
+
+@pytest.mark.parametrize("receiver", ["replay", "http"])
+def test_refused_questions_and_measurements_say_why_and_do_not_loop(monkeypatch, receiver):
+    monkeypatch.syspath_prepend(str(FRONTEND))
+    fake, doc, calls = fake_api("complete"), run_doc("complete"), []
+    doc["comparisons"], doc["suggestions"] = {}, ["How does this system work?"]
+
+    def refuse(*a, **k):
+        calls.append(a)
+        raise fake.ApiError(429, "too many requests; try again in a minute")
+
+    fake.run, fake.compare, fake.ask = (lambda rid: doc), refuse, refuse
+    monkeypatch.setitem(sys.modules, "api", fake)
+    at = AppTest.from_file(str(FRONTEND / "views/run.py"), default_timeout=20)
+    at.session_state["status"] = {**STATUS, "receiver": receiver}
+    at.session_state["run_id"] = "r1"
+    at.run()
+    assert not at.exception, at.exception
+    assert len(calls) == (1 if receiver == "replay" else 0)  # the automatic fill-in tries once, not in a loop
+    if receiver == "replay":
+        assert any("Could not measure" in e.value for e in at.error)
+    next(b for b in at.button if b.label == "How does this system work?").click().run()
+    assert any("Could not ask" in e.value for e in at.error)  # the refusal survives the redraw
+    assert len(calls) == (2 if receiver == "replay" else 1)  # one ask; no second automatic measurement

@@ -51,6 +51,9 @@ def _fact_numbers(obj, out: set[str]) -> set[str]:
         out |= _forms(float(obj))
         if float(obj).is_integer():
             out.add(str(int(obj)))
+    elif isinstance(obj, str):  # a fact written as text, e.g. "33% of the recording is flat": its numbers count
+        for m in _NUM.findall(_WINDOW_ID.sub(" ", obj)):
+            out |= _forms(float(m)) | {m}
     elif isinstance(obj, dict):
         for v in obj.values():
             _fact_numbers(v, out)

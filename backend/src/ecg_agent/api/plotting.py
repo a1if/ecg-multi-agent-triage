@@ -32,12 +32,14 @@ def envelope(x: np.ndarray, start: int, end: int, max_points: int) -> tuple[list
 
 def signal_view(perception, start_s: float, end_s: float, max_points: int = 2000) -> dict:
     """The signal envelope plus every beat in the range: time, class, confidence, tier, reference label."""
-    if not perception.best or perception.unreadable:
+    if not perception.best:
         return {"t": [], "v": [], "beats": [], "fs": FS}
     b, out = perception.best.beats, perception.best.out
     sig = b.signal
     start, end = max(0, int(start_s * FS)), min(len(sig), int(end_s * FS))
     t, v = envelope(sig, start, end, max(100, min(max_points, 20000)))
+    if perception.unreadable:  # show why it could not be read, but mark no beats: none of them can be trusted
+        return {"t": t, "v": v, "beats": [], "fs": FS, "duration_s": round(len(sig) / FS, 2), "unreadable": True}
     idx = np.flatnonzero((b.peaks >= start) & (b.peaks < end))
     win_of = {}
     for w in perception.windows.values():

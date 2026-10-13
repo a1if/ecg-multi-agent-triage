@@ -17,7 +17,15 @@ all presets, explanations, questions and summaries come from the recording. It r
 offers (7 records x every stress scenario x 3 modes = 210) and also checks each one demonstrates fully: a sensible
 status, every finding explained, both channels measured in the Adapter vs text tab, and every suggested question
 answered. The Ask tab's suggested questions use the recorded wording, so they always get the recorded Gemma answers;
-a visitor's own wording falls back to keyword routing, labelled. Adapter-channel answers are keyed by the
+a visitor's own wording falls back to keyword routing, labelled.
+
+**Before pushing a change to the demo**, click through it the way a visitor would:
+`frontend/scripts/check_demo_ui.py` reads every option from the site's own dropdowns and, for each combination, starts
+a run and checks what is on the page: no error box, who wrote the summary, the ECG trace; for an unreadable recording
+the warning, the explained trace and "Need a person: whole recording"; for a completed one the findings table,
+"Explain this finding", the clinician override, the Adapter vs text numbers and every suggested question clicked in
+turn; then the worklist and "How it works". Run it against the live entry point (`streamlit_app.py`) installed like
+Community Cloud, then confirm `replay_misses` is still 0: every click was served by recorded Gemma. Adapter-channel answers are keyed by the
 adapter's SHA-256, so a promoted adapter can never be served the previous adapter's answers.
 
 1. Sign in at https://share.streamlit.io with GitHub.

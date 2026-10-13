@@ -165,7 +165,8 @@ class ReasoningAgent:
         for m in s.get("queue", []):
             if m.intent == "record_ready" and m.performative == "failure":
                 self.failed = m.content.get("error", "perception failed")
-                self.report = {"status": "failed", "error": self.failed, "narrative": f"No triage: {self.failed}."}
+                self.report = {"status": "failed", "error": self.failed, "narrative": f"No triage: {self.failed}.",
+                               "narrative_source": "quality-check"}
                 self._send("done", {"report": self.report})
             elif m.intent == "record_ready":
                 self.summary, self.candidates = m.content["summary"], m.content["candidates"]

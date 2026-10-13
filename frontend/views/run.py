@@ -30,7 +30,9 @@ c = st.columns(4)
 c[0].metric("Most urgent tier", ui.tier_badge(report.get("overall_tier")) if report.get("overall_tier") else "—")
 c[1].metric("Beats", (d.get("summary") or {}).get("beats", "—"))
 c[2].metric("Windows reviewed", len(d["findings"]))
-c[3].metric("Need a person", len(report.get("needs_human_review", [])))
+# An unreadable recording is not triaged at all: all of it goes to a person, not zero windows.
+c[3].metric("Need a person", "whole recording" if d["status"] == "unreadable"
+            else len(report.get("needs_human_review", [])))
 if d["status"] == "unreadable":
     st.error(f"**Not triaged:** {report.get('error', 'the recording could not be read')}. A person needs to look "
              "at this recording; the system does not guess.", icon="⚠️")
@@ -38,7 +40,9 @@ for w in report.get("quality_warnings", []):
     st.warning(w, icon="📉")
 if report.get("narrative"):
     src = report.get("narrative_source", "")
-    who = ("a fixed template from the findings (an LLM summary was rejected by the grounding check)"
+    who = ("the perception agent's quality check (no LLM: an unreadable recording is never sent to one)"
+           if src == "quality-check" or (not src and d["status"] == "unreadable")
+           else "a fixed template from the findings (an LLM summary was rejected by the grounding check)"
            if "rejected" in src else "a fixed template from the findings (no LLM available)"
            if src.startswith("template") else ui.source_label(src))
     st.info(f"{report['narrative']}\n\n*Summary written by {who}.*", icon="📝")
@@ -100,7 +104,8 @@ if running:
 # ----- the ECG -----
 windows = {w["id"]: w for w in d["windows"]}
 findings = d["findings"]
-duration = (d.get("summary") or {}).get("duration_s") or 0
+# An unreadable recording has no screening summary, but its signal is still worth seeing: it shows why.
+duration = (d.get("summary") or {}).get("duration_s") or (d.get("params") or {}).get("duration_s") or 0
 tab_ecg, tab_find, tab_cmp, tab_ask, tab_audit = st.tabs(["📈 ECG", "🔎 Findings", "⚖️ Adapter vs text", "🩺 Ask",
                                                            "🧾 Audit trail"])
 
@@ -124,6 +129,9 @@ with tab_ecg:
         st.info("No signal to show.")
     else:
         ov = api.signal(run_id, 0, duration, 1500)
+        if ov.get("unreadable"):
+            st.caption("The signal as the perception agent received it. It was too noisy to classify, so no beats "
+                       "are marked and nothing was triaged: a person reviews this recording.")
         fig = go.Figure(go.Scattergl(x=ov["t"], y=ov["v"], mode="lines", line={"width": 0.6, "color": "#555"},
                                      hoverinfo="skip"))
         shade(fig)
@@ -235,15 +243,29 @@ with tab_cmp:
     # With recorded answers, measuring is free and instant, so fill the tab in at once: it is the first thing a
     # visitor should see. With a live GPU it costs a Gemma call per window, so it waits for the button.
     replay = (st.session_state.get("status") or {}).get("receiver") == "replay"
-    if todo and (replay or st.button(f"Measure both channels for {len(todo)} window(s)", type="primary")):
+    # A refusal (e.g. the rate limit) is remembered for this run: the automatic fill-in stops instead of asking
+    # again on every redraw, the reason stays on screen, and the button offers a later try. A failure does not
+    # force a redraw, which would swallow whatever the visitor just clicked.
+    failed = st.session_state.get(f"cmp_failed_{run_id}")
+    if failed and todo:
+        st.error(f"Could not measure: {failed}", icon="⏳")
+    auto = replay and not failed
+    if todo and (auto or st.button(f"Measure both channels for {len(todo)} window(s)", type="primary")):
+        err = None
         with st.spinner("Asking for each window over the other channel (through the orchestrator)..."):
             for w in todo:
                 try:
                     api.compare(run_id, w)
                 except api.ApiError as e:
-                    st.error(f"{w}: {e.detail}")
+                    err = f"{w}: {e.detail}"
                     break
-        st.rerun()
+        if err:
+            st.session_state[f"cmp_failed_{run_id}"] = err
+            if not failed:
+                st.error(f"Could not measure: {err}", icon="⏳")
+        else:
+            st.session_state.pop(f"cmp_failed_{run_id}", None)
+            st.rerun()
 
     def val(m: dict | None, key: str):
         return (m or {}).get(key)
@@ -314,22 +336,28 @@ with tab_ask:
                 meta.append(f"refused by {a['data'].get('layer', 'safety patterns')}")
             st.caption(" · ".join(meta))
     # Suggested questions, in the order the demo recorded them: clicking one always gets the recorded Gemma answer.
+    # The window review ("Can you look at ...") is offered last, once the others are asked: it adds a reviewed
+    # window, which changes what the question classifier is shown for every question after it.
     asked = {a["question"] for a in d.get("answers", [])}
     offered = [q for q in d.get("suggestions", []) if q not in asked]
+    if len(offered) > 1 and offered[-1].startswith("Can you look at"):
+        offered = offered[:-1]
+    ask_error = st.session_state.pop(f"ask_error_{run_id}", None)
+    if ask_error:
+        st.error(f"Could not ask: {ask_error}", icon="⏳")
     picked = None
     if offered:
         st.caption("Try one of these, or ask your own:")
-        cols = st.columns(2)
         for i, sq in enumerate(offered):
-            if cols[i % 2].button(sq, key=f"suggest_{i}", use_container_width=True):
+            if st.button(sq, key=f"suggest_{i}"):
                 picked = sq
     q = st.chat_input("Ask a question about this recording") or picked
     if q:
         with st.spinner("The reasoning agent is working (it may consult the perception agent)..."):
             try:
                 api.ask(run_id, q)
-            except api.ApiError as e:
-                st.error(e.detail)
+            except api.ApiError as e:  # kept across the redraw below, or it would vanish at once
+                st.session_state[f"ask_error_{run_id}"] = e.detail
         st.rerun()
 
 # ----- audit -----
