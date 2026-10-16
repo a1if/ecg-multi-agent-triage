@@ -60,7 +60,7 @@ jobs:
         run: pytest -q --junitxml=test-results.xml
       - name: Promotion gate (the deployed adapter must be the one held-out evidence selects)
         run: python scripts/promotion_gate.py --check
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: always()
         with: { name: backend-test-results, path: backend/test-results.xml }
 
@@ -97,7 +97,7 @@ jobs:
                                  for k, v in d["summary"].items()))
               print(f"- **{name}**: {d['violations']} violations; {extra}")
           EOF
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: always()
         with: { name: safety-eval, path: "backend/results/eval_*.json" }
 
